@@ -1,0 +1,508 @@
+
+<!DOCTYPE html>
+
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>靴裏データ 分析ダッシュボード</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f1117;
+  --surface: #1a1f2e;
+  --surface2: #222840;
+  --border: #2a3050;
+  --text: #e8eaf0;
+  --text-muted: #7a82a0;
+  --text-dim: #4a5070;
+  --accent-gold: #f0a500;
+  --accent-purple: #a78bfa;
+  --accent-blue: #60a5fa;
+  --red: #e85555;
+  --blue: #4a9eff;
+  --orange: #f0a500;
+}
+* { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+body { font-family:'Noto Sans JP',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; }
+
+/* HEADER */
+.header { background:linear-gradient(135deg,#1a1f3a 0%,#0f1117 100%); padding:24px 16px 20px; border-bottom:1px solid var(–border); }
+.header-top { display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+.header-icon { font-size:28px; }
+.header-title { font-size:20px; font-weight:900; background:linear-gradient(90deg,#a78bfa,#60a5fa); -webkit-background-clip:text; -webkit-text-fill-color:transparent; line-height:1.2; }
+.header-sub { font-size:11px; color:var(–text-muted); margin-top:2px; font-family:‘DM Mono’,monospace; }
+.header-stats { display:flex; gap:8px; flex-wrap:wrap; }
+.stat-pill { background:var(–surface2); border:1px solid var(–border); border-radius:20px; padding:6px 14px; font-size:12px; color:var(–text-muted); display:flex; align-items:center; gap:6px; }
+.stat-pill strong { color:var(–accent-gold); font-size:14px; font-family:‘DM Mono’,monospace; }
+
+/* LOADING / ERROR */
+.loading-wrap { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:60px 20px; gap:16px; }
+.spinner { width:40px; height:40px; border:3px solid var(–border); border-top-color:#a78bfa; border-radius:50%; animation:spin 0.8s linear infinite; }
+@keyframes spin { to{transform:rotate(360deg)} }
+.loading-text { font-size:13px; color:var(–text-muted); }
+.error-box { margin:20px 16px; background:#2a1a1a; border:1px solid #aa3333; border-radius:14px; padding:20px; }
+.error-title { font-size:14px; font-weight:700; color:#ff6666; margin-bottom:8px; }
+.error-text { font-size:12px; color:var(–text-muted); line-height:1.7; }
+
+/* TABS */
+.tabs { display:flex; gap:4px; padding:14px 16px 0; border-bottom:1px solid var(–border); overflow-x:auto; }
+.tab-btn { background:none; border:none; padding:10px 14px; font-family:‘Noto Sans JP’,sans-serif; font-size:12px; font-weight:600; color:var(–text-muted); cursor:pointer; border-bottom:2px solid transparent; white-space:nowrap; transition:all 0.2s; }
+.tab-btn.active { color:var(–text); border-bottom-color:#a78bfa; }
+
+.tab-panel { display:none; padding:16px; }
+.tab-panel.active { display:block; }
+
+.section-title { font-size:12px; font-weight:700; color:var(–text-muted); margin-bottom:12px; padding-bottom:6px; border-bottom:1px solid var(–border); letter-spacing:0.05em; }
+
+/* PATTERN BARS */
+.pattern-bar-item { display:flex; align-items:center; gap:10px; margin-bottom:12px; background:var(–surface); border-radius:12px; padding:10px 12px; border:1px solid var(–border); }
+.pattern-mini-feet { flex-shrink:0; width:48px; display:flex; gap:2px; justify-content:center; }
+.pattern-bar-info { flex:1; min-width:0; }
+.pattern-bar-name { font-size:11px; color:var(–text-muted); margin-bottom:4px; }
+.pattern-bar-track { height:22px; background:var(–bg); border-radius:6px; overflow:hidden; }
+.pattern-bar-fill { height:100%; border-radius:6px; display:flex; align-items:center; justify-content:flex-end; padding-right:8px; transition:width 1s cubic-bezier(.4,0,.2,1); min-width:36px; }
+.pattern-bar-val { font-size:11px; font-weight:700; color:white; font-family:‘DM Mono’,monospace; }
+.pattern-bar-pct { font-size:11px; color:var(–text-muted); font-family:‘DM Mono’,monospace; min-width:32px; text-align:right; }
+
+/* STATS GRID */
+.stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
+.stat-card { background:var(–surface); border:1px solid var(–border); border-radius:14px; padding:14px; text-align:center; }
+.stat-icon { font-size:22px; margin-bottom:6px; }
+.stat-label { font-size:11px; color:var(–text-muted); margin-bottom:4px; }
+.stat-value { font-size:26px; font-weight:900; font-family:‘DM Mono’,monospace; }
+
+/* SYMPTOM BARS */
+.symptom-bar-item { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.symptom-name { font-size:12px; min-width:80px; color:var(–text); }
+.symptom-track { flex:1; height:20px; background:var(–bg); border-radius:5px; overflow:hidden; }
+.symptom-fill { height:100%; border-radius:5px; display:flex; align-items:center; justify-content:flex-end; padding-right:6px; }
+.symptom-val { font-size:10px; font-weight:700; color:white; font-family:‘DM Mono’,monospace; }
+.symptom-pct { font-size:11px; color:var(–text-muted); min-width:36px; text-align:right; font-family:‘DM Mono’,monospace; }
+
+/* INSIGHT CARDS */
+.insight-card { border-radius:14px; padding:14px 16px; margin-bottom:10px; border:1px solid; }
+.insight-card.red { background:#1f1015; border-color:#aa3344; }
+.insight-card.blue { background:#101520; border-color:#334488; }
+.insight-card.purple { background:#15101f; border-color:#663388; }
+.insight-card.yellow { background:#1a1500; border-color:#886600; }
+.insight-title { font-size:13px; font-weight:700; margin-bottom:6px; }
+.insight-text { font-size:12px; color:var(–text-muted); line-height:1.6; }
+
+/* ATTRIBUTE BARS */
+.attr-section { margin-bottom:20px; }
+.attr-bar-item { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+.attr-label { font-size:11px; color:var(–text-muted); min-width:70px; }
+.attr-track { flex:1; height:18px; background:var(–bg); border-radius:4px; overflow:hidden; }
+.attr-fill { height:100%; border-radius:4px; background:linear-gradient(90deg,#a78bfa,#60a5fa); display:flex; align-items:center; justify-content:flex-end; padding-right:6px; min-width:24px; }
+.attr-val { font-size:10px; font-weight:700; color:white; font-family:‘DM Mono’,monospace; }
+.attr-pct { font-size:10px; color:var(–text-muted); min-width:36px; text-align:right; font-family:‘DM Mono’,monospace; }
+
+/* HEATMAP */
+.heatmap-wrap { overflow-x:auto; }
+.heatmap-table { border-collapse:separate; border-spacing:3px; font-size:10px; min-width:320px; }
+.heatmap-table th { font-size:9px; font-weight:600; color:var(–text-muted); padding:4px 4px; white-space:nowrap; text-align:center; }
+.heatmap-table .row-label { font-size:9px; font-weight:600; color:var(–text); padding-right:6px; white-space:nowrap; text-align:right; }
+.heatmap-table td.cell { width:46px; height:30px; text-align:center; border-radius:5px; font-weight:700; font-size:10px; font-family:‘DM Mono’,monospace; }
+
+/* PATTERN DETAIL */
+.pattern-detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.pattern-detail-card { background:var(–surface); border:1px solid var(–border); border-radius:14px; padding:12px; text-align:center; }
+.pd-feet { display:flex; justify-content:center; gap:4px; margin-bottom:6px; }
+.pd-name { font-size:10px; font-weight:700; color:var(–text); margin-bottom:3px; line-height:1.3; }
+.pd-count { font-size:22px; font-weight:900; font-family:‘DM Mono’,monospace; }
+.pd-pct { font-size:10px; color:var(–text-muted); }
+
+/* REFRESH */
+.refresh-btn { display:flex; align-items:center; gap:6px; margin:0 16px 12px; background:var(–surface2); border:1px solid var(–border); border-radius:10px; padding:10px 16px; font-family:‘Noto Sans JP’,sans-serif; font-size:12px; font-weight:600; color:var(–text-muted); cursor:pointer; width:calc(100% - 32px); justify-content:center; }
+.last-updated { text-align:center; font-size:10px; color:var(–text-dim); padding:8px; font-family:‘DM Mono’,monospace; }
+
+/* NO DATA */
+.no-data { text-align:center; padding:40px 20px; color:var(–text-muted); font-size:13px; line-height:2; }
+</style>
+
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div class="header-icon">👟</div>
+    <div>
+      <div class="header-title">靴裏データ 分析ダッシュボード</div>
+      <div class="header-sub">リアルタイム更新 | フォーム回答データ</div>
+    </div>
+  </div>
+  <div class="header-stats" id="header-stats">
+    <div class="stat-pill">読み込み中...</div>
+  </div>
+</div>
+
+<div id="main-content">
+  <div class="loading-wrap">
+    <div class="spinner"></div>
+    <div class="loading-text">データ取得中...</div>
+  </div>
+</div>
+
+<script>
+// =============================================
+// スプレッドシートID
+// =============================================
+const SHEET_ID = '1vMdjNFr3UtVLPDprkJ43lX4W1VLuOiOgEgB43dgDC_I';
+const SHEET_NAME = 'フォームの回答 1';
+const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
+
+// 摩耗パターン
+const PATTERNS = [
+  { name:'①踵外側摩耗',    color:'#e85555', wearPos:'heel-out'    },
+  { name:'②踵内側摩耗',    color:'#4a9eff', wearPos:'heel-in'     },
+  { name:'⑥左右非対称摩耗',color:'#f0a500', wearPos:'asymmetric'  },
+  { name:'④踵中央摩耗',    color:'#f0d000', wearPos:'heel-center' },
+  { name:'⑧外側全体摩耗',  color:'#ff6eb4', wearPos:'outer-all'   },
+  { name:'⑤踵全面摩耗',    color:'#a855f7', wearPos:'heel-full'   },
+  { name:'⑨母趾球摩耗',    color:'#22d3a0', wearPos:'ball'        },
+  { name:'⑫靴先反り摩耗',  color:'#c084fc', wearPos:'toe-tip'     },
+  { name:'⑩前足部外側摩耗',color:'#f97316', wearPos:'fore-out'    },
+  { name:'③前足部全体摩耗',color:'#4ade80', wearPos:'fore-all'    },
+  { name:'⑦内側全体摩耗',  color:'#22d3ee', wearPos:'inner-all'   },
+  { name:'⑪土踏まず摩耗',  color:'#94a3b8', wearPos:'arch'        },
+];
+
+const SYMPTOMS = ['腰痛','膝痛','首こり','肩こり','足裏痛','外反母趾'];
+const SYMPTOM_ICONS = {'腰痛':'🔴','膝痛':'🟠','首こり':'🔵','肩こり':'💜','足裏痛':'🟡','外反母趾':'🟤'};
+
+// =============================================
+// 足型SVG
+// =============================================
+function footSVG(wearPos, isLeft, size=36) {
+  const h = Math.round(size * 1.65);
+  const VW = size, VH = h;
+  const flip = isLeft ? `transform="translate(${VW},0) scale(-1,1)"` : '';
+
+  const wearZones = {
+    'heel-out':    [{x:2,           y:h*0.68, w:size*0.28, h:h*0.22, rx:5}],
+    'heel-in':     [{x:size*0.62,   y:h*0.68, w:size*0.28, h:h*0.22, rx:5}],
+    'heel-center': [{x:size*0.18,   y:h*0.70, w:size*0.56, h:h*0.20, rx:7}],
+    'heel-full':   [{x:2,           y:h*0.65, w:size*0.9,  h:h*0.25, rx:9}],
+    'outer-all':   [{x:2,           y:h*0.14, w:size*0.22, h:h*0.66, rx:5}],
+    'inner-all':   [{x:size*0.72,   y:h*0.14, w:size*0.22, h:h*0.66, rx:5}],
+    'ball':        [{x:size*0.55,   y:h*0.26, w:size*0.32, h:h*0.18, rx:6}],
+    'fore-all':    [{x:size*0.08,   y:h*0.03, w:size*0.78, h:h*0.26, rx:8}],
+    'fore-out':    [{x:2,           y:h*0.04, w:size*0.24, h:h*0.24, rx:5}],
+    'toe-tip':     [{x:size*0.12,   y:0,      w:size*0.68, h:h*0.10, rx:5}],
+    'arch':        [{x:size*0.60,   y:h*0.42, w:size*0.26, h:h*0.18, rx:6}],
+    'asymmetric':  [{x:2,           y:h*0.63, w:size*0.28, h:h*0.26, rx:5}],
+  };
+
+  const color = PATTERNS.find(p=>p.wearPos===wearPos)?.color || '#e85555';
+  const zones = (wearZones[wearPos]||[]).map(z =>
+    `<rect x="${Math.round(z.x)}" y="${Math.round(z.y)}" width="${Math.round(z.w)}" height="${Math.round(z.h)}" rx="${z.rx}" fill="${color}" opacity="0.88"/>`
+  ).join('');
+
+  // 足型パス（右足基準）
+  const p = (x,y) => `${Math.round(x*size)} ${Math.round(y*h)}`;
+  const sole = `M ${p(0.48,0.97)} C ${p(0.30,0.97)} ${p(0.10,0.88)} ${p(0.08,0.77)} C ${p(0.06,0.66)} ${p(0.08,0.54)} ${p(0.09,0.44)} C ${p(0.10,0.34)} ${p(0.08,0.25)} ${p(0.12,0.18)} C ${p(0.15,0.11)} ${p(0.12,0.05)} ${p(0.16,0.02)} C ${p(0.20,0)} ${p(0.26,0)} ${p(0.32,0.01)} C ${p(0.40,0.03)} ${p(0.45,0.09)} ${p(0.46,0.16)} C ${p(0.47,0.23)} ${p(0.45,0.31)} ${p(0.44,0.38)} C ${p(0.43,0.45)} ${p(0.43,0.51)} ${p(0.46,0.55)} C ${p(0.50,0.59)} ${p(0.55,0.57)} ${p(0.56,0.52)} C ${p(0.57,0.46)} ${p(0.55,0.38)} ${p(0.54,0.30)} C ${p(0.53,0.22)} ${p(0.52,0.13)} ${p(0.55,0.07)} C ${p(0.58,0.01)} ${p(0.65,0)} ${p(0.72,0.04)} C ${p(0.79,0.09)} ${p(0.82,0.19)} ${p(0.81,0.30)} C ${p(0.80,0.40)} ${p(0.77,0.50)} ${p(0.77,0.60)} C ${p(0.77,0.70)} ${p(0.79,0.79)} ${p(0.80,0.87)} C ${p(0.80,0.93)} ${p(0.70,0.97)} ${p(0.58,0.97)} Z`;
+
+  // 足指5本
+  const toeData = [
+    {cx:0.30,cy:0.01,rx:0.095,ry:0.058},
+    {cx:0.40,cy:-0.01,rx:0.083,ry:0.052},
+    {cx:0.50,cy:0,rx:0.074,ry:0.047},
+    {cx:0.60,cy:0.02,rx:0.065,ry:0.042},
+    {cx:0.68,cy:0.05,rx:0.055,ry:0.036},
+  ];
+  const toes = toeData.map(t =>
+    `<ellipse cx="${Math.round(t.cx*size)}" cy="${Math.round(t.cy*h+h*0.06)}" rx="${Math.round(t.rx*size)}" ry="${Math.round(t.ry*h)}" fill="#1e2540" stroke="#3a4060" stroke-width="1"/>`
+  ).join('');
+
+  return `<svg width="${size}" height="${h}" viewBox="0 0 ${VW} ${VH}" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g ${flip}>
+      <path d="${sole}" fill="#1e2540" stroke="#3a4060" stroke-width="1.5"/>
+      ${toes}${zones}
+    </g>
+  </svg>`;
+}
+
+// =============================================
+// CSV パース
+// =============================================
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  if (lines.length < 2) return [];
+  const headers = lines[0].split(',').map(h => h.replace(/^"|"$/g,'').trim());
+  return lines.slice(1).map(line => {
+    const cols = []; let cur='', inQ=false;
+    for (let c of line) {
+      if (c==='"') inQ=!inQ;
+      else if (c===',' && !inQ) { cols.push(cur); cur=''; }
+      else cur+=c;
+    }
+    cols.push(cur);
+    const row={};
+    headers.forEach((h,i) => row[h]=(cols[i]||'').trim());
+    return row;
+  });
+}
+
+// =============================================
+// データ分析
+// =============================================
+function analyze(rows) {
+  const total = rows.length;
+  const wearCount = {}; PATTERNS.forEach(p=>wearCount[p.name]=0);
+  const symCount = {}; SYMPTOMS.forEach(s=>symCount[s]=0);
+  const wearSym = {}; PATTERNS.forEach(p=>{wearSym[p.name]={}; SYMPTOMS.forEach(s=>wearSym[p.name][s]=0);});
+  const ageCount={}, genderCount={}, shoeCount={};
+
+  rows.forEach(row => {
+    const wearKey = Object.keys(row).find(k=>k.includes('摩耗パターン'));
+    const symKey  = Object.keys(row).find(k=>k.includes('現在ある症状') && !k.includes('その他'));
+    const ageKey  = Object.keys(row).find(k=>k.includes('年齢'));
+    const genderKey = Object.keys(row).find(k=>k.includes('性別'));
+    const shoeKey = Object.keys(row).find(k=>k.includes('靴の種類'));
+
+    const wear = wearKey ? row[wearKey] : '';
+    const syms = symKey  ? row[symKey]  : '';
+    const age  = ageKey  ? row[ageKey]  : '';
+    const gender = genderKey ? row[genderKey] : '';
+    const shoe = shoeKey ? row[shoeKey] : '';
+
+    if (wear && wearCount[wear]!==undefined) wearCount[wear]++;
+    SYMPTOMS.forEach(s => {
+      if (syms.includes(s)) {
+        symCount[s]++;
+        if (wear && wearSym[wear]) wearSym[wear][s]++;
+      }
+    });
+    if (age)    ageCount[age]    = (ageCount[age]||0)+1;
+    if (gender) genderCount[gender] = (genderCount[gender]||0)+1;
+    if (shoe)   shoeCount[shoe]  = (shoeCount[shoe]||0)+1;
+  });
+
+  return { total, wearCount, symCount, wearSym, ageCount, genderCount, shoeCount };
+}
+
+// =============================================
+// ヒートマップ色
+// =============================================
+function heatColor(v) {
+  if (!v) return 'var(--surface)';
+  const i = v/100;
+  return `rgba(${Math.round(20+200*i)},${Math.round(30+30*(1-i))},${Math.round(60+20*(1-i))},0.85)`;
+}
+
+// =============================================
+// レンダリング
+// =============================================
+function render(d) {
+  const { total, wearCount, symCount, wearSym, ageCount, genderCount, shoeCount } = d;
+
+  document.getElementById('header-stats').innerHTML = `
+    <div class="stat-pill">総回答数 <strong>${total}</strong> 件</div>
+    <div class="stat-pill">摩耗パターン <strong>12</strong> 種類</div>
+  `;
+
+  const sorted = [...PATTERNS].sort((a,b)=>(wearCount[b.name]||0)-(wearCount[a.name]||0));
+  const maxWear = Math.max(...sorted.map(p=>wearCount[p.name]||0), 1);
+  const maxSym  = Math.max(...SYMPTOMS.map(s=>symCount[s]||0), 1);
+
+  document.getElementById('main-content').innerHTML = `
+    <button class="refresh-btn" onclick="loadData()">🔄 データを更新する</button>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('overview',this)">📊 概要</button>
+      <button class="tab-btn" onclick="switchTab('patterns',this)">👟 摩耗</button>
+      <button class="tab-btn" onclick="switchTab('symptoms',this)">🩺 症状</button>
+      <button class="tab-btn" onclick="switchTab('attributes',this)">👤 属性</button>
+      <button class="tab-btn" onclick="switchTab('matrix',this)">🔥 マトリクス</button>
+    </div>
+
+    <!-- 概要 -->
+    <div id="tab-overview" class="tab-panel active">
+      ${total===0 ? `<div class="no-data">📋 まだ回答データがありません<br>フォームへの回答が集まると<br>自動でグラフに反映されます</div>` : ''}
+      ${total>0 ? `
+      <div class="section-title">📊 摩耗パターン分布（上位5件）</div>
+      ${sorted.slice(0,5).map(p=>`
+        <div class="pattern-bar-item">
+          <div class="pattern-mini-feet">
+            ${footSVG(p.wearPos,true,22)}${footSVG(p.wearPos,false,22)}
+          </div>
+          <div class="pattern-bar-info">
+            <div class="pattern-bar-name">${p.name}</div>
+            <div class="pattern-bar-track">
+              <div class="pattern-bar-fill" style="width:${Math.round((wearCount[p.name]||0)/maxWear*100)}%;background:${p.color}">
+                <span class="pattern-bar-val">${wearCount[p.name]||0}件</span>
+              </div>
+            </div>
+          </div>
+          <div class="pattern-bar-pct">${Math.round((wearCount[p.name]||0)/total*100)}%</div>
+        </div>`).join('')}
+
+      <div class="section-title" style="margin-top:20px;">🩺 症状出現頻度</div>
+      ${SYMPTOMS.map(s=>`
+        <div class="symptom-bar-item">
+          <div class="symptom-name">${SYMPTOM_ICONS[s]||''} ${s}</div>
+          <div class="symptom-track">
+            <div class="symptom-fill" style="width:${Math.round((symCount[s]||0)/maxSym*100)}%;background:linear-gradient(90deg,#a78bfa,#60a5fa)">
+              <span class="symptom-val">${symCount[s]||0}</span>
+            </div>
+          </div>
+          <div class="symptom-pct">${Math.round((symCount[s]||0)/total*100)}%</div>
+        </div>`).join('')}
+
+      <div class="section-title" style="margin-top:20px;">💡 インサイト</div>
+      ${generateInsights(sorted,wearCount,symCount,total)}
+      ` : ''}
+    </div>
+
+    <!-- 摩耗パターン -->
+    <div id="tab-patterns" class="tab-panel">
+      <div class="section-title">全摩耗パターン一覧</div>
+      ${total===0 ? `<div class="no-data">回答データなし</div>` : `
+      <div class="pattern-detail-grid">
+        ${sorted.map(p=>`
+        <div class="pattern-detail-card" style="border-top:3px solid ${p.color}">
+          <div class="pd-feet">${footSVG(p.wearPos,true,32)}${footSVG(p.wearPos,false,32)}</div>
+          <div style="font-size:9px;color:var(--text-muted);margin-bottom:3px;">左　右</div>
+          <div class="pd-name">${p.name}</div>
+          <div class="pd-count" style="color:${p.color}">${wearCount[p.name]||0}</div>
+          <div class="pd-pct">${Math.round((wearCount[p.name]||0)/total*100)}% (${wearCount[p.name]||0}件)</div>
+        </div>`).join('')}
+      </div>`}
+    </div>
+
+    <!-- 症状 -->
+    <div id="tab-symptoms" class="tab-panel">
+      <div class="section-title">症状別 件数</div>
+      ${total===0 ? `<div class="no-data">回答データなし</div>` : `
+      <div class="stats-grid">
+        ${SYMPTOMS.map(s=>`
+        <div class="stat-card">
+          <div class="stat-icon">${SYMPTOM_ICONS[s]||'🔵'}</div>
+          <div class="stat-label">${s}</div>
+          <div class="stat-value">${symCount[s]||0}</div>
+        </div>`).join('')}
+      </div>`}
+    </div>
+
+    <!-- 属性 -->
+    <div id="tab-attributes" class="tab-panel">
+      ${total===0 ? `<div class="no-data">回答データなし</div>` : `
+      <div class="attr-section">
+        <div class="section-title">年齢分布</div>
+        ${Object.entries(ageCount).sort().map(([k,v])=>`
+        <div class="attr-bar-item">
+          <div class="attr-label">${k}</div>
+          <div class="attr-track"><div class="attr-fill" style="width:${Math.round(v/total*100)}%"><span class="attr-val">${v}</span></div></div>
+          <div class="attr-pct">${Math.round(v/total*100)}%</div>
+        </div>`).join('')}
+      </div>
+      <div class="attr-section">
+        <div class="section-title">性別分布</div>
+        ${Object.entries(genderCount).map(([k,v])=>`
+        <div class="attr-bar-item">
+          <div class="attr-label">${k}</div>
+          <div class="attr-track"><div class="attr-fill" style="width:${Math.round(v/total*100)}%"><span class="attr-val">${v}</span></div></div>
+          <div class="attr-pct">${Math.round(v/total*100)}%</div>
+        </div>`).join('')}
+      </div>
+      <div class="attr-section">
+        <div class="section-title">靴の種類</div>
+        ${Object.entries(shoeCount).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`
+        <div class="attr-bar-item">
+          <div class="attr-label">${k}</div>
+          <div class="attr-track"><div class="attr-fill" style="width:${Math.round(v/total*100)}%"><span class="attr-val">${v}</span></div></div>
+          <div class="attr-pct">${Math.round(v/total*100)}%</div>
+        </div>`).join('')}
+      </div>`}
+    </div>
+
+    <!-- マトリクス -->
+    <div id="tab-matrix" class="tab-panel">
+      <div class="section-title">摩耗パターン × 症状 関連性（%）</div>
+      ${total===0 ? `<div class="no-data">回答データなし</div>` : `
+      <div class="heatmap-wrap">
+        <table class="heatmap-table">
+          <thead><tr><th></th>${SYMPTOMS.map(s=>`<th>${s}</th>`).join('')}</tr></thead>
+          <tbody>
+            ${sorted.map(p=>{
+              const cnt = wearCount[p.name]||0;
+              return `<tr>
+                <td class="row-label">${p.name.substring(0,5)}</td>
+                ${SYMPTOMS.map(s=>{
+                  const v = cnt>0 ? Math.round((wearSym[p.name][s]||0)/cnt*100) : 0;
+                  return `<td class="cell" style="background:${heatColor(v)};color:${v>50?'white':'var(--text-muted)'}">${v>0?v+'%':''}</td>`;
+                }).join('')}
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div style="margin-top:10px;font-size:10px;color:var(--text-dim);">※ 各セルは「そのパターンの回答者のうち該当症状を持つ割合」</div>`}
+    </div>
+
+    <div class="last-updated" id="last-updated"></div>
+  `;
+
+  document.getElementById('last-updated').textContent = '最終更新: ' + new Date().toLocaleString('ja-JP');
+}
+
+function generateInsights(sorted, wearCount, symCount, total) {
+  if (total===0) return '';
+  const top = sorted[0];
+  const topPct = Math.round((wearCount[top.name]||0)/total*100);
+  const topSym = Object.entries(symCount).sort((a,b)=>b[1]-a[1])[0];
+  const femaleCount = 0; // データから取得
+  return `
+    <div class="insight-card red">
+      <div class="insight-title">🏆 最多摩耗パターン</div>
+      <div class="insight-text">${top.name}が全体の${topPct}%（${wearCount[top.name]||0}件）を占めます。</div>
+    </div>
+    <div class="insight-card blue">
+      <div class="insight-title">🔴 最多症状</div>
+      <div class="insight-text">${topSym[0]}が${topSym[1]}件（${Math.round(topSym[1]/total*100)}%）と最多です。</div>
+    </div>
+    <div class="insight-card yellow">
+      <div class="insight-title">💡 平均症状数</div>
+      <div class="insight-text">1人あたり平均<strong>${(Object.values(symCount).reduce((s,v)=>s+v,0)/total).toFixed(1)}種類</strong>の症状があります。</div>
+    </div>`;
+}
+
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// =============================================
+// データ読み込み
+// =============================================
+async function loadData() {
+  document.getElementById('main-content').innerHTML = `
+    <div class="loading-wrap"><div class="spinner"></div><div class="loading-text">データ取得中...</div></div>`;
+  try {
+    const res = await fetch(CSV_URL);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const text = await res.text();
+    const rows = parseCSV(text);
+    render(analyze(rows));
+  } catch(e) {
+    document.getElementById('main-content').innerHTML = `
+      <div class="error-box">
+        <div class="error-title">⚠️ データ取得に失敗しました</div>
+        <div class="error-text">
+          スプレッドシートの公開設定を確認してください。<br><br>
+          スプレッドシートアプリ →「⋯」→「共有とエクスポート」→「アクセスを管理」→「リンクを知っている全員・閲覧者」<br><br>
+          エラー: ${e.message}
+        </div>
+      </div>
+      <button class="refresh-btn" onclick="loadData()" style="margin-top:8px;">🔄 再試行する</button>`;
+  }
+}
+
+loadData();
+</script>
+
+</body>
+</html>
