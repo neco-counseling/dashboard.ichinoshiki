@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 
 <html lang="ja">
@@ -7,7 +8,7 @@
 <title>靴裏データ 分析ダッシュボード</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#0f1117;--surface:#1a1f2e;--surface2:#222840;--border:#2a3050;--text:#e8eaf0;--muted:#7a82a0;--dim:#4a5070;--gold:#f0a500;--purple:#a78bfa;--blue:#60a5fa}
+:root{--bg:#0f1117;--surface:#1a1f2e;--surface2:#222840;--border:#2a3050;--text:#e8eaf0;--muted:#7a82a0;--dim:#4a5070;--gold:#f0a500}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 .header{background:linear-gradient(135deg,#1a1f3a,#0f1117);padding:20px 16px 16px;border-bottom:1px solid var(--border)}
@@ -32,9 +33,9 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .tab-panel.active{display:block}
 .sec{font-size:11px;font-weight:700;color:var(--muted);margin-bottom:10px;padding-bottom:5px;border-bottom:1px solid var(--border);letter-spacing:.05em}
 .pbar{display:flex;align-items:center;gap:9px;margin-bottom:10px;background:var(--surface);border-radius:12px;padding:9px 11px;border:1px solid var(--border)}
-.pbar-feet{flex-shrink:0;display:flex;gap:6px;align-items:flex-end}
+.pbar-feet{flex-shrink:0;display:flex;gap:4px;align-items:flex-end}
 .pbar-foot-col{display:flex;flex-direction:column;align-items:center;gap:2px}
-.pbar-label{font-size:8px;color:var(--muted);font-family:'DM Mono',monospace}
+.pbar-lbl{font-size:8px;color:var(--muted);font-family:'DM Mono',monospace}
 .pbar-info{flex:1;min-width:0}
 .pbar-name{font-size:11px;color:var(--muted);margin-bottom:3px}
 .pbar-track{height:20px;background:var(--bg);border-radius:5px;overflow:hidden}
@@ -67,7 +68,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .hm-table td.cell{width:44px;height:28px;text-align:center;border-radius:5px;font-weight:700;font-size:10px;font-family:'DM Mono',monospace}
 .pd-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .pd-card{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:11px;text-align:center}
-.pd-feet{display:flex;justify-content:center;gap:8px;margin-bottom:5px;align-items:flex-end}
+.pd-feet{display:flex;justify-content:center;gap:6px;margin-bottom:5px;align-items:flex-end}
 .pd-foot-col{display:flex;flex-direction:column;align-items:center;gap:2px}
 .pd-fl{font-size:8px;color:var(--muted);font-family:'DM Mono',monospace}
 .pd-name{font-size:10px;font-weight:700;color:var(--text);margin-bottom:2px;line-height:1.3}
@@ -104,244 +105,177 @@ const SHEET_NAME = 'フォームの回答 1';
 const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
 
 const PATTERNS = [
-  {name:'①踵外側摩耗',   color:'#e85555',wearPos:'heel-out'   },
-  {name:'②踵内側摩耗',   color:'#4a9eff',wearPos:'heel-in'    },
-  {name:'⑥左右非対称摩耗',color:'#f0a500',wearPos:'asym'      },
-  {name:'④踵中央摩耗',   color:'#f0d000',wearPos:'heel-center'},
-  {name:'⑧外側全体摩耗', color:'#ff6eb4',wearPos:'outer-all'  },
-  {name:'⑤踵全面摩耗',   color:'#a855f7',wearPos:'heel-full'  },
-  {name:'⑨母趾球摩耗',   color:'#22d3a0',wearPos:'ball'       },
-  {name:'⑫靴先反り摩耗', color:'#c084fc',wearPos:'toe-tip'    },
-  {name:'⑩前足部外側摩耗',color:'#f97316',wearPos:'fore-out'  },
-  {name:'③前足部全体摩耗',color:'#4ade80',wearPos:'fore-all'  },
-  {name:'⑦内側全体摩耗', color:'#22d3ee',wearPos:'inner-all'  },
-  {name:'⑪土踏まず摩耗', color:'#94a3b8',wearPos:'arch'       },
+  {name:'①踵外側摩耗',    color:'#e85555', wearPos:'heel-out'   },
+  {name:'②踵内側摩耗',    color:'#4a9eff', wearPos:'heel-in'    },
+  {name:'⑥左右非対称摩耗',color:'#f0a500', wearPos:'asym'       },
+  {name:'④踵中央摩耗',    color:'#f0d000', wearPos:'heel-center'},
+  {name:'⑧外側全体摩耗',  color:'#ff6eb4', wearPos:'outer-all'  },
+  {name:'⑤踵全面摩耗',    color:'#a855f7', wearPos:'heel-full'  },
+  {name:'⑨母趾球摩耗',    color:'#22d3a0', wearPos:'ball'       },
+  {name:'⑫靴先反り摩耗',  color:'#c084fc', wearPos:'toe-tip'    },
+  {name:'⑩前足部外側摩耗',color:'#f97316', wearPos:'fore-out'   },
+  {name:'③前足部全体摩耗',color:'#4ade80', wearPos:'fore-all'   },
+  {name:'⑦内側全体摩耗',  color:'#22d3ee', wearPos:'inner-all'  },
+  {name:'⑪土踏まず摩耗',  color:'#94a3b8', wearPos:'arch'       },
 ];
 
 const SYMPTOMS = ['腰痛','膝痛','首こり','肩こり','足裏痛','外反母趾'];
 const SYM_ICONS = {'腰痛':'🔴','膝痛':'🟠','首こり':'🔵','肩こり':'💜','足裏痛':'🟡','外反母趾':'🟤'};
 
 // =============================================
-// 靴底SVG生成
-// 提供されたSVGデザインをベースに
-// 摩耗ゾーンをclipPathで足型内に収める
-//
-// 右足 (isLeft=false):
-//   アーチくびれ = 左側（内側）
-//   外側(小指) = 右端(x大)
-//   内側(親指) = 左端(x小)
-//
-// 左足 (isLeft=true):
-//   アーチくびれ = 右側（内側）
-//   外側(小指) = 左端(x小)
-//   内側(親指) = 右端(x大)
+// 靴底SVG
+// 参考画像のSVGをそのまま使用
+// RIGHT足: アーチ(土踏まず)くびれ = 左側(x小) = 内側
+//   外側(小指) = 右(x大)
+//   内側(親指) = 左(x小)
+// LEFT足: アーチくびれ = 右側(x大) = 内側
+//   外側(小指) = 左(x小)
+//   内側(親指) = 右(x大)
+// viewBox: 0 0 150 310
 // =============================================
 
-// 右足のアウトラインパス (viewBox 0 0 150 310)
-const RIGHT_SOLE = `M 75 12
-  C 55 12, 18 36, 12 76
-  C 8 112, 20 150, 26 172
-  C 30 190, 30 206, 30 220
-  C 30 234, 30 248, 34 260
-  C 38 272, 50 284, 68 290
-  C 80 295, 96 295, 110 291
-  C 122 287, 128 274, 128 260
-  C 128 244, 122 228, 120 212
-  C 118 194, 122 178, 124 164
-  C 126 146, 130 124, 130 100
-  C 130 60, 106 12, 75 12 Z`;
+const PATH_RIGHT = `M 75 12 C 55 12, 18 36, 12 76 C 8 112, 20 150, 26 172 C 30 190, 30 206, 30 220 C 30 234, 30 248, 34 260 C 38 272, 50 284, 68 290 C 80 295, 96 295, 110 291 C 122 287, 128 274, 128 260 C 128 244, 122 228, 120 212 C 118 194, 122 178, 124 164 C 126 146, 130 124, 130 100 C 130 60, 106 12, 75 12 Z`;
 
-// 左足のアウトラインパス
-const LEFT_SOLE = `M 75 12
-  C 95 12, 132 36, 138 76
-  C 142 112, 130 150, 124 172
-  C 120 190, 120 206, 120 220
-  C 120 234, 120 248, 116 260
-  C 112 272, 100 284, 82 290
-  C 70 295, 54 295, 40 291
-  C 28 287, 22 274, 22 260
-  C 22 244, 28 228, 30 212
-  C 32 194, 28 178, 26 164
-  C 24 146, 20 124, 20 100
-  C 20 60, 44 12, 75 12 Z`;
+const PATH_LEFT = `M 75 12 C 95 12, 132 36, 138 76 C 142 112, 130 150, 124 172 C 120 190, 120 206, 120 220 C 120 234, 120 248, 116 260 C 112 272, 100 284, 82 290 C 70 295, 54 295, 40 291 C 28 287, 22 274, 22 260 C 22 244, 28 228, 30 212 C 32 194, 28 178, 26 164 C 24 146, 20 124, 20 100 C 20 60, 44 12, 75 12 Z`;
 
-// トレッドパターン（右足）
-function treadRight() {
+function tread(isLeft) {
+  if (!isLeft) return `
+    <rect x="26" y="58"  width="88" height="4" rx="2" fill="white" opacity="0.15"/>
+    <rect x="24" y="72"  width="94" height="4" rx="2" fill="white" opacity="0.15"/>
+    <rect x="24" y="86"  width="98" height="4" rx="2" fill="white" opacity="0.15"/>
+    <rect x="24" y="100" width="100" height="4" rx="2" fill="white" opacity="0.15"/>
+    <rect x="25" y="114" width="100" height="4" rx="2" fill="white" opacity="0.15"/>
+    <rect x="26" y="128" width="96"  height="4" rx="2" fill="white" opacity="0.15"/>
+    <circle cx="68"  cy="162" r="3" fill="white" opacity="0.15"/>
+    <circle cx="84"  cy="165" r="3" fill="white" opacity="0.15"/>
+    <circle cx="100" cy="164" r="3" fill="white" opacity="0.15"/>
+    <path d="M 54 232 Q 91 220, 116 226" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.15"/>
+    <path d="M 50 246 Q 91 233, 120 240" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" opacity="0.15"/>
+    <path d="M 50 258 Q 91 246, 122 254" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.15"/>`;
   return `
-    <rect fill="#f0ede8" opacity="0.12" x="26" y="58"  width="88" height="4" rx="2"/>
-    <rect fill="#f0ede8" opacity="0.12" x="24" y="72"  width="94" height="4" rx="2"/>
-    <rect fill="#f0ede8" opacity="0.12" x="24" y="86"  width="98" height="4" rx="2"/>
-    <rect fill="#f0ede8" opacity="0.12" x="24" y="100" width="100" height="4" rx="2"/>
-    <rect fill="#f0ede8" opacity="0.12" x="25" y="114" width="100" height="4" rx="2"/>
-    <rect fill="#f0ede8" opacity="0.12" x="26" y="128" width="96"  height="4" rx="2"/>
-    <circle fill="#f0ede8" opacity="0.12" cx="68"  cy="160" r="2.5"/>
-    <circle fill="#f0ede8" opacity="0.12" cx="84"  cy="163" r="2.5"/>
-    <circle fill="#f0ede8" opacity="0.12" cx="100" cy="162" r="2.5"/>
-    <path fill="none" stroke="#f0ede8" opacity="0.12" stroke-width="3.5" stroke-linecap="round" d="M 58 228 Q 95 216, 116 222"/>
-    <path fill="none" stroke="#f0ede8" opacity="0.12" stroke-width="2.5" stroke-linecap="round" d="M 54 243 Q 95 230, 120 237"/>
-    <path fill="none" stroke="#f0ede8" opacity="0.12" stroke-width="1.5" stroke-linecap="round" d="M 54 256 Q 95 244, 122 252"/>`;
+    <rect x="36" y="58"  width="88" height="4" rx="2" fill="white" opacity="0.15"/>
+    <rect x="32" y="72"  width="94" height="4" rx="2" fill="white" opacity="0.15"/>
+    <rect x="28" y="86"  width="98" height="4" rx="2" fill="white" opacity="0.15"/>
+    <rect x="26" y="100" width="100" height="4" rx="2" fill="white" opacity="0.15"/>
+    <rect x="25" y="114" width="100" height="4" rx="2" fill="white" opacity="0.15"/>
+    <rect x="24" y="128" width="96"  height="4" rx="2" fill="white" opacity="0.15"/>
+    <circle cx="50" cy="162" r="3" fill="white" opacity="0.15"/>
+    <circle cx="66" cy="165" r="3" fill="white" opacity="0.15"/>
+    <circle cx="82" cy="164" r="3" fill="white" opacity="0.15"/>
+    <path d="M 34 232 Q 55 220, 96 226" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.15"/>
+    <path d="M 30 246 Q 55 233, 100 240" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" opacity="0.15"/>
+    <path d="M 28 258 Q 55 246, 100 254" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.15"/>`;
 }
 
-// トレッドパターン（左足）
-function treadLeft() {
-  return `
-    <rect fill="#f0ede8" opacity="0.12" x="36" y="58"  width="88" height="4" rx="2"/>
-    <rect fill="#f0ede8" opacity="0.12" x="32" y="72"  width="94" height="4" rx="2"/>
-    <rect fill="#f0ede8" opacity="0.12" x="28" y="86"  width="98" height="4" rx="2"/>
-    <rect fill="#f0ede8" opacity="0.12" x="26" y="100" width="100" height="4" rx="2"/>
-    <rect fill="#f0ede8" opacity="0.12" x="25" y="114" width="100" height="4" rx="2"/>
-    <rect fill="#f0ede8" opacity="0.12" x="24" y="128" width="96"  height="4" rx="2"/>
-    <circle fill="#f0ede8" opacity="0.12" cx="50" cy="160" r="2.5"/>
-    <circle fill="#f0ede8" opacity="0.12" cx="66" cy="163" r="2.5"/>
-    <circle fill="#f0ede8" opacity="0.12" cx="82" cy="162" r="2.5"/>
-    <path fill="none" stroke="#f0ede8" opacity="0.12" stroke-width="3.5" stroke-linecap="round" d="M 34 228 Q 55 216, 92 222"/>
-    <path fill="none" stroke="#f0ede8" opacity="0.12" stroke-width="2.5" stroke-linecap="round" d="M 30 243 Q 55 230, 96 237"/>
-    <path fill="none" stroke="#f0ede8" opacity="0.12" stroke-width="1.5" stroke-linecap="round" d="M 28 256 Q 55 244, 96 252"/>`;
-}
-
-// 摩耗ゾーン定義
-// 右足基準 (viewBox 0 0 150 310):
-//   外側(小指) = 右(x大), 内側(親指) = 左(x小)
-//   かかと = y:220-295, 前足部 = y:40-145
-function getWearZone(wearPos, isLeft, color) {
-  // 右足の座標を定義
-  const zonesRight = {
-    'heel-out':    `<rect x="88" y="230" width="38" height="55" rx="12" fill="${color}" opacity="0.85"/>`,
-    'heel-in':     `<rect x="24" y="230" width="38" height="55" rx="12" fill="${color}" opacity="0.85"/>`,
-    'heel-center': `<rect x="40" y="235" width="70" height="50" rx="14" fill="${color}" opacity="0.85"/>`,
-    'heel-full':   `<rect x="22" y="228" width="108" height="58" rx="14" fill="${color}" opacity="0.85"/>`,
-    'outer-all':   `<rect x="102" y="60" width="30" height="200" rx="12" fill="${color}" opacity="0.75"/>`,
-    'inner-all':   `<rect x="18"  y="60" width="30" height="200" rx="12" fill="${color}" opacity="0.75"/>`,
-    'ball':        `<rect x="18"  y="80" width="50" height="55" rx="14" fill="${color}" opacity="0.85"/>`,
-    'fore-all':    `<rect x="18"  y="48" width="114" height="90" rx="14" fill="${color}" opacity="0.80"/>`,
-    'fore-out':    `<rect x="94"  y="48" width="38" height="80" rx="12" fill="${color}" opacity="0.85"/>`,
-    'toe-tip':     `<rect x="30"  y="10" width="90" height="55" rx="14" fill="${color}" opacity="0.80"/>`,
-    'arch':        `<rect x="18"  y="150" width="30" height="60" rx="10" fill="${color}" opacity="0.85"/>`,
-    'asym':        `<rect x="88" y="230" width="38" height="55" rx="12" fill="${color}" opacity="0.85"/>`,
+// 摩耗ゾーン
+// RIGHT足: 外側=右(x大), 内側=左(x小)
+// LEFT足:  外側=左(x小), 内側=右(x大)
+function wearZone(pos, isLeft, color) {
+  const R = {
+    'heel-out':    `<rect x="90" y="228" width="36" height="58" rx="14"/>`,
+    'heel-in':     `<rect x="24" y="228" width="36" height="58" rx="14"/>`,
+    'heel-center': `<rect x="38" y="232" width="74" height="54" rx="14"/>`,
+    'heel-full':   `<rect x="18" y="226" width="112" height="60" rx="16"/>`,
+    'outer-all':   `<rect x="100" y="55" width="32" height="210" rx="14"/>`,
+    'inner-all':   `<rect x="18"  y="55" width="32" height="210" rx="14"/>`,
+    'ball':        `<rect x="18"  y="75" width="55" height="60"  rx="14"/>`,
+    'fore-all':    `<rect x="18"  y="44" width="114" height="96" rx="16"/>`,
+    'fore-out':    `<rect x="90"  y="44" width="42" height="86"  rx="14"/>`,
+    'toe-tip':     `<rect x="28"  y="8"  width="94" height="60"  rx="16"/>`,
+    'arch':        `<rect x="18"  y="150" width="32" height="66" rx="12"/>`,
+    'asym':        `<rect x="90" y="228" width="36" height="58" rx="14"/>`,
   };
-
-  // 左足の座標（内外が逆）
-  const zonesLeft = {
-    'heel-out':    `<rect x="24" y="230" width="38" height="55" rx="12" fill="${color}" opacity="0.85"/>`,
-    'heel-in':     `<rect x="88" y="230" width="38" height="55" rx="12" fill="${color}" opacity="0.85"/>`,
-    'heel-center': `<rect x="40" y="235" width="70" height="50" rx="14" fill="${color}" opacity="0.85"/>`,
-    'heel-full':   `<rect x="20" y="228" width="108" height="58" rx="14" fill="${color}" opacity="0.85"/>`,
-    'outer-all':   `<rect x="18"  y="60" width="30" height="200" rx="12" fill="${color}" opacity="0.75"/>`,
-    'inner-all':   `<rect x="102" y="60" width="30" height="200" rx="12" fill="${color}" opacity="0.75"/>`,
-    'ball':        `<rect x="82"  y="80" width="50" height="55" rx="14" fill="${color}" opacity="0.85"/>`,
-    'fore-all':    `<rect x="18"  y="48" width="114" height="90" rx="14" fill="${color}" opacity="0.80"/>`,
-    'fore-out':    `<rect x="18"  y="48" width="38" height="80" rx="12" fill="${color}" opacity="0.85"/>`,
-    'toe-tip':     `<rect x="30"  y="10" width="90" height="55" rx="14" fill="${color}" opacity="0.80"/>`,
-    'arch':        `<rect x="102" y="150" width="30" height="60" rx="10" fill="${color}" opacity="0.85"/>`,
-    'asym':        `<rect x="24" y="230" width="38" height="55" rx="12" fill="${color}" opacity="0.85"/>`,
+  const L = {
+    'heel-out':    `<rect x="24" y="228" width="36" height="58" rx="14"/>`,
+    'heel-in':     `<rect x="90" y="228" width="36" height="58" rx="14"/>`,
+    'heel-center': `<rect x="38" y="232" width="74" height="54" rx="14"/>`,
+    'heel-full':   `<rect x="20" y="226" width="112" height="60" rx="16"/>`,
+    'outer-all':   `<rect x="18"  y="55" width="32" height="210" rx="14"/>`,
+    'inner-all':   `<rect x="100" y="55" width="32" height="210" rx="14"/>`,
+    'ball':        `<rect x="77"  y="75" width="55" height="60"  rx="14"/>`,
+    'fore-all':    `<rect x="18"  y="44" width="114" height="96" rx="16"/>`,
+    'fore-out':    `<rect x="18"  y="44" width="42" height="86"  rx="14"/>`,
+    'toe-tip':     `<rect x="28"  y="8"  width="94" height="60"  rx="16"/>`,
+    'arch':        `<rect x="100" y="150" width="32" height="66" rx="12"/>`,
+    'asym':        `<rect x="24" y="228" width="36" height="58" rx="14"/>`,
   };
-
-  return isLeft ? (zonesLeft[wearPos]||'') : (zonesRight[wearPos]||'');
+  const shape = isLeft ? (L[pos]||'') : (R[pos]||'');
+  return shape.replace('<rect ', `<rect fill="${color}" opacity="0.88" `);
 }
 
-// SVG生成関数
-function makeSole(wearPos, isLeft, color, size) {
-  const VW = 150, VH = 310;
-  const dispW = size;
-  const dispH = Math.round(size * VH / VW);
-  const solePath = isLeft ? LEFT_SOLE : RIGHT_SOLE;
-  const tread = isLeft ? treadLeft() : treadRight();
-  const wearZone = getWearZone(wearPos, isLeft, color);
-  const uid = `clip_${wearPos}_${isLeft?'L':'R'}_${Math.random().toString(36).substr(2,5)}`;
-
-  return `<svg width="${dispW}" height="${dispH}" viewBox="0 0 ${VW} ${VH}" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <clipPath id="${uid}">
-        <path d="${solePath}"/>
-      </clipPath>
-    </defs>
-    <path d="${solePath}" fill="#1e2438" stroke="#3a4a6a" stroke-width="2"/>
-    ${tread}
-    <g clip-path="url(#${uid})">${wearZone}</g>
+let _uid = 0;
+function makeSole(wearPos, isLeft, color, px) {
+  const VW=150, VH=310;
+  const dH = Math.round(px * VH / VW);
+  const path = isLeft ? PATH_LEFT : PATH_RIGHT;
+  const id = `c${++_uid}`;
+  const zone = wearZone(wearPos, isLeft, color);
+  return `<svg width="${px}" height="${dH}" viewBox="0 0 ${VW} ${VH}" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs><clipPath id="${id}"><path d="${path}"/></clipPath></defs>
+    <path d="${path}" fill="#1e2438" stroke="#3a4a6a" stroke-width="2"/>
+    ${tread(isLeft)}
+    <g clip-path="url(#${id})">${zone}</g>
   </svg>`;
 }
 
 function feetHTML(p, sz) {
   return `
-    <div class="pbar-foot-col">
-      <div class="pbar-label">右</div>
-      ${makeSole(p.wearPos, false, p.color, sz)}
-    </div>
-    <div class="pbar-foot-col">
-      <div class="pbar-label">左</div>
-      ${makeSole(p.wearPos, true, p.color, sz)}
-    </div>`;
+    <div class="pbar-foot-col"><div class="pbar-lbl">右</div>${makeSole(p.wearPos,false,p.color,sz)}</div>
+    <div class="pbar-foot-col"><div class="pbar-lbl">左</div>${makeSole(p.wearPos,true,p.color,sz)}</div>`;
 }
 
-// CSV パース
 function parseCSV(txt) {
   const lines = txt.trim().split('\n');
   if (lines.length < 2) return [];
-  const hds = lines[0].split(',').map(h => h.replace(/^"|"$/g,'').trim());
-  return lines.slice(1).map(line => {
-    const cols = []; let cur = '', inQ = false;
-    for (let c of line) {
-      if (c==='"') inQ=!inQ;
-      else if (c===',' && !inQ) { cols.push(cur); cur=''; }
-      else cur += c;
-    }
+  const hds = lines[0].split(',').map(h=>h.replace(/^"|"$/g,'').trim());
+  return lines.slice(1).map(line=>{
+    const cols=[]; let cur='',inQ=false;
+    for(let c of line){if(c==='"')inQ=!inQ;else if(c===','&&!inQ){cols.push(cur);cur='';}else cur+=c;}
     cols.push(cur);
-    const row = {};
-    hds.forEach((h,i) => row[h] = (cols[i]||'').trim());
+    const row={};hds.forEach((h,i)=>row[h]=(cols[i]||'').trim());
     return row;
   });
 }
 
-// 分析
 function analyze(rows) {
-  const total = rows.length;
-  const wc = {}; PATTERNS.forEach(p => wc[p.name]=0);
-  const sc = {}; SYMPTOMS.forEach(s => sc[s]=0);
-  const ws = {}; PATTERNS.forEach(p => { ws[p.name]={}; SYMPTOMS.forEach(s => ws[p.name][s]=0); });
-  const ac={}, gc={}, shc={};
-
-  rows.forEach(row => {
-    const wk  = Object.keys(row).find(k => k.includes('摩耗パターン'));
-    const sk  = Object.keys(row).find(k => k.includes('現在ある症状') && !k.includes('その他'));
-    const ak  = Object.keys(row).find(k => k.includes('年齢'));
-    const gk  = Object.keys(row).find(k => k.includes('性別'));
-    const shk = Object.keys(row).find(k => k.includes('靴の種類'));
-    // 写真項目は無視（ファイルアップロード列はスキップ）
-    const wear   = wk  ? row[wk]  : '';
-    const syms   = sk  ? row[sk]  : '';
-    const age    = ak  ? row[ak]  : '';
-    const gender = gk  ? row[gk]  : '';
-    const shoe   = shk ? row[shk] : '';
-
-    if (wear && wc[wear]!==undefined) wc[wear]++;
-    SYMPTOMS.forEach(s => {
-      if (syms.includes(s)) { sc[s]++; if (wear && ws[wear]) ws[wear][s]++; }
-    });
-    if (age)    ac[age]    = (ac[age]||0)+1;
-    if (gender) gc[gender] = (gc[gender]||0)+1;
-    if (shoe)   shc[shoe]  = (shc[shoe]||0)+1;
+  const total=rows.length;
+  const wc={};PATTERNS.forEach(p=>wc[p.name]=0);
+  const sc={};SYMPTOMS.forEach(s=>sc[s]=0);
+  const ws={};PATTERNS.forEach(p=>{ws[p.name]={};SYMPTOMS.forEach(s=>ws[p.name][s]=0);});
+  const ac={},gc={},shc={};
+  rows.forEach(row=>{
+    const wk=Object.keys(row).find(k=>k.includes('摩耗パターン'));
+    const sk=Object.keys(row).find(k=>k.includes('現在ある症状')&&!k.includes('その他'));
+    const ak=Object.keys(row).find(k=>k.includes('年齢'));
+    const gk=Object.keys(row).find(k=>k.includes('性別'));
+    const shk=Object.keys(row).find(k=>k.includes('靴の種類'));
+    const wear=wk?row[wk]:'',syms=sk?row[sk]:'';
+    const age=ak?row[ak]:'',gender=gk?row[gk]:'',shoe=shk?row[shk]:'';
+    if(wear&&wc[wear]!==undefined)wc[wear]++;
+    SYMPTOMS.forEach(s=>{if(syms.includes(s)){sc[s]++;if(wear&&ws[wear])ws[wear][s]++;}});
+    if(age)ac[age]=(ac[age]||0)+1;
+    if(gender)gc[gender]=(gc[gender]||0)+1;
+    if(shoe)shc[shoe]=(shc[shoe]||0)+1;
   });
-  return { total, wc, sc, ws, ac, gc, shc };
+  return{total,wc,sc,ws,ac,gc,shc};
 }
 
-function heatCol(v) {
-  if (!v) return 'var(--surface)';
-  const i = v/100;
-  return `rgba(${Math.round(20+200*i)},${Math.round(30+30*(1-i))},${Math.round(60+20*(1-i))},.85)`;
+function heatCol(v){
+  if(!v)return'var(--surface)';
+  const i=v/100;
+  return`rgba(${Math.round(20+200*i)},${Math.round(30+30*(1-i))},${Math.round(60+20*(1-i))},.85)`;
 }
 
-// レンダリング
-function render(d) {
-  const { total, wc, sc, ws, ac, gc, shc } = d;
-  document.getElementById('hstats').innerHTML = `
+function render(d){
+  const{total,wc,sc,ws,ac,gc,shc}=d;
+  document.getElementById('hstats').innerHTML=`
     <div class="stat-pill">総回答数 <strong>${total}</strong> 件</div>
     <div class="stat-pill">摩耗パターン <strong>12</strong> 種類</div>`;
+  const sorted=[...PATTERNS].sort((a,b)=>(wc[b.name]||0)-(wc[a.name]||0));
+  const mxW=Math.max(...sorted.map(p=>wc[p.name]||0),1);
+  const mxS=Math.max(...SYMPTOMS.map(s=>sc[s]||0),1);
 
-  const sorted = [...PATTERNS].sort((a,b) => (wc[b.name]||0)-(wc[a.name]||0));
-  const mxW = Math.max(...sorted.map(p => wc[p.name]||0), 1);
-  const mxS = Math.max(...SYMPTOMS.map(s => sc[s]||0), 1);
-
-  document.getElementById('main').innerHTML = `
+  document.getElementById('main').innerHTML=`
   <button class="refresh-btn" onclick="loadData()">🔄 データを更新する</button>
   <div class="tabs">
     <button class="tab-btn active" onclick="sw('overview',this)">📊 概要</button>
@@ -352,11 +286,11 @@ function render(d) {
   </div>
 
   <div id="tab-overview" class="tab-panel active">
-    ${total===0 ? `<div class="no-data">📋 まだ回答データがありません<br>フォームへの回答が集まると自動でグラフに反映されます</div>` : `
+    ${total===0?`<div class="no-data">📋 まだ回答データがありません<br>フォームへの回答が集まると自動でグラフに反映されます</div>`:`
     <div class="sec">📊 摩耗パターン分布（上位5件）</div>
     ${sorted.slice(0,5).map(p=>`
     <div class="pbar">
-      <div class="pbar-feet">${feetHTML(p,32)}</div>
+      <div class="pbar-feet">${feetHTML(p,30)}</div>
       <div class="pbar-info">
         <div class="pbar-name">${p.name}</div>
         <div class="pbar-track"><div class="pbar-fill" style="width:${Math.round((wc[p.name]||0)/mxW*100)}%;background:${p.color}"><span class="pbar-val">${wc[p.name]||0}件</span></div></div>
@@ -376,13 +310,13 @@ function render(d) {
 
   <div id="tab-patterns" class="tab-panel">
     <div class="sec">全摩耗パターン一覧</div>
-    ${total===0 ? `<div class="no-data">回答データなし</div>` : `
+    ${total===0?`<div class="no-data">回答データなし</div>`:`
     <div class="pd-grid">
       ${sorted.map(p=>`
       <div class="pd-card" style="border-top:3px solid ${p.color}">
         <div class="pd-feet">
-          <div class="pd-foot-col"><div class="pd-fl">右</div>${makeSole(p.wearPos,false,p.color,44)}</div>
-          <div class="pd-foot-col"><div class="pd-fl">左</div>${makeSole(p.wearPos,true,p.color,44)}</div>
+          <div class="pd-foot-col"><div class="pd-fl">右</div>${makeSole(p.wearPos,false,p.color,42)}</div>
+          <div class="pd-foot-col"><div class="pd-fl">左</div>${makeSole(p.wearPos,true,p.color,42)}</div>
         </div>
         <div class="pd-name">${p.name}</div>
         <div class="pd-cnt" style="color:${p.color}">${wc[p.name]||0}</div>
@@ -393,7 +327,7 @@ function render(d) {
 
   <div id="tab-symptoms" class="tab-panel">
     <div class="sec">症状別 件数</div>
-    ${total===0 ? `<div class="no-data">回答データなし</div>` : `
+    ${total===0?`<div class="no-data">回答データなし</div>`:`
     <div class="sym-grid">
       ${SYMPTOMS.map(s=>`
       <div class="sym-card">
@@ -405,7 +339,7 @@ function render(d) {
   </div>
 
   <div id="tab-attr" class="tab-panel">
-    ${total===0 ? `<div class="no-data">回答データなし</div>` : `
+    ${total===0?`<div class="no-data">回答データなし</div>`:`
     <div class="attr-sec">
       <div class="sec">年齢分布</div>
       ${Object.entries(ac).sort().map(([k,v])=>`
@@ -431,16 +365,16 @@ function render(d) {
 
   <div id="tab-matrix" class="tab-panel">
     <div class="sec">摩耗パターン × 症状 関連性（%）</div>
-    ${total===0 ? `<div class="no-data">回答データなし</div>` : `
+    ${total===0?`<div class="no-data">回答データなし</div>`:`
     <div class="hm-wrap">
       <table class="hm-table">
         <thead><tr><th></th>${SYMPTOMS.map(s=>`<th>${s}</th>`).join('')}</tr></thead>
         <tbody>${sorted.map(p=>{
-          const cnt = wc[p.name]||0;
-          return `<tr><td class="rl">${p.name.substring(0,5)}</td>
+          const cnt=wc[p.name]||0;
+          return`<tr><td class="rl">${p.name.substring(0,5)}</td>
           ${SYMPTOMS.map(s=>{
-            const v = cnt>0 ? Math.round((ws[p.name][s]||0)/cnt*100) : 0;
-            return `<td class="cell" style="background:${heatCol(v)};color:${v>50?'white':'var(--muted)'}">${v>0?v+'%':''}</td>`;
+            const v=cnt>0?Math.round((ws[p.name][s]||0)/cnt*100):0;
+            return`<td class="cell" style="background:${heatCol(v)};color:${v>50?'white':'var(--muted)'}">${v>0?v+'%':''}</td>`;
           }).join('')}</tr>`;
         }).join('')}</tbody>
       </table>
@@ -449,38 +383,37 @@ function render(d) {
   </div>
 
   <div class="last-upd" id="lupd"></div>`;
-
-  document.getElementById('lupd').textContent = '最終更新: ' + new Date().toLocaleString('ja-JP');
+  document.getElementById('lupd').textContent='最終更新: '+new Date().toLocaleString('ja-JP');
 }
 
-function insightHTML(sorted, wc, sc, total) {
-  if (!total) return '';
-  const top = sorted[0];
-  const topPct = Math.round((wc[top.name]||0)/total*100);
-  const topSym = Object.entries(sc).sort((a,b)=>b[1]-a[1])[0];
-  const avg = (Object.values(sc).reduce((s,v)=>s+v,0)/total).toFixed(1);
-  return `
+function insightHTML(sorted,wc,sc,total){
+  if(!total)return'';
+  const top=sorted[0];
+  const topPct=Math.round((wc[top.name]||0)/total*100);
+  const topSym=Object.entries(sc).sort((a,b)=>b[1]-a[1])[0];
+  const avg=(Object.values(sc).reduce((s,v)=>s+v,0)/total).toFixed(1);
+  return`
   <div class="ins red"><div class="ins-title">🏆 最多摩耗パターン</div><div class="ins-text">${top.name}が全体の${topPct}%（${wc[top.name]||0}件）を占めます。</div></div>
   <div class="ins blue"><div class="ins-title">🔴 最多症状</div><div class="ins-text">${topSym[0]}が${topSym[1]}件（${Math.round(topSym[1]/total*100)}%）と最多です。</div></div>
   <div class="ins yellow"><div class="ins-title">💡 平均症状数</div><div class="ins-text">1人あたり平均<strong>${avg}種類</strong>の症状があります。</div></div>`;
 }
 
-function sw(id, btn) {
+function sw(id,btn){
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-'+id).classList.add('active');
   btn.classList.add('active');
 }
 
-async function loadData() {
-  document.getElementById('main').innerHTML = `<div class="loading-wrap"><div class="spinner"></div><div class="loading-text">データ取得中...</div></div>`;
-  try {
-    const res = await fetch(CSV_URL);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const txt = await res.text();
+async function loadData(){
+  document.getElementById('main').innerHTML=`<div class="loading-wrap"><div class="spinner"></div><div class="loading-text">データ取得中...</div></div>`;
+  try{
+    const res=await fetch(CSV_URL);
+    if(!res.ok)throw new Error(`HTTP ${res.status}`);
+    const txt=await res.text();
     render(analyze(parseCSV(txt)));
-  } catch(e) {
-    document.getElementById('main').innerHTML = `
+  }catch(e){
+    document.getElementById('main').innerHTML=`
     <div class="error-box">
       <div class="error-title">⚠️ データ取得に失敗しました</div>
       <div class="error-text">スプレッドシートの公開設定を確認してください。<br>エラー: ${e.message}</div>
