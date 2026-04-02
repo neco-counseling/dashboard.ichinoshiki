@@ -123,84 +123,119 @@ const SYMPTOMS = ['腰痛','膝痛','首こり','肩こり','足裏痛','外反�
 const SYM_ICONS = {'腰痛':'🔴','膝痛':'🟠','首こり':'🔵','肩こり':'💜','足裏痛':'🟡','外反母趾':'🟤'};
 
 // =============================================
-// 靴底SVG
-// 参考画像のSVGをそのまま使用
-// RIGHT足: アーチ(土踏まず)くびれ = 左側(x小) = 内側
-//   外側(小指) = 右(x大)
-//   内側(親指) = 左(x小)
-// LEFT足: アーチくびれ = 右側(x大) = 内側
-//   外側(小指) = 左(x小)
-//   内側(親指) = 右(x大)
-// viewBox: 0 0 150 310
+// 足底視点（靴底を下から見る）の座標系
+//
+// 右足:
+//   親指 = 右側(x大)  小指 = 左側(x小)
+//   内側 = 右(x大)    外側 = 左(x小)
+//   土踏まずくびれ = 右側
+//
+// 左足:
+//   親指 = 左側(x小)  小指 = 右側(x大)
+//   内側 = 左(x小)    外側 = 右(x大)
+//   土踏まずくびれ = 左側
+//
+// SVGパス: viewBox 0 0 150 310
+// 右足パス: くびれが右側（x大側）
+// 左足パス: くびれが左側（x小側）
 // =============================================
 
-const PATH_RIGHT = `M 75 12 C 55 12, 18 36, 12 76 C 8 112, 20 150, 26 172 C 30 190, 30 206, 30 220 C 30 234, 30 248, 34 260 C 38 272, 50 284, 68 290 C 80 295, 96 295, 110 291 C 122 287, 128 274, 128 260 C 128 244, 122 228, 120 212 C 118 194, 122 178, 124 164 C 126 146, 130 124, 130 100 C 130 60, 106 12, 75 12 Z`;
+// 右足: 土踏まずくびれ = 右側(x大)
+const PATH_RIGHT = `M 75 12
+  C 95 12, 132 36, 138 76
+  C 142 112, 130 150, 124 172
+  C 120 190, 120 206, 120 220
+  C 120 234, 120 248, 116 260
+  C 112 272, 100 284, 82 290
+  C 70 295, 54 295, 40 291
+  C 28 287, 22 274, 22 260
+  C 22 244, 28 228, 30 212
+  C 32 194, 28 178, 26 164
+  C 24 146, 20 124, 20 100
+  C 20 60, 44 12, 75 12 Z`;
 
-const PATH_LEFT = `M 75 12 C 95 12, 132 36, 138 76 C 142 112, 130 150, 124 172 C 120 190, 120 206, 120 220 C 120 234, 120 248, 116 260 C 112 272, 100 284, 82 290 C 70 295, 54 295, 40 291 C 28 287, 22 274, 22 260 C 22 244, 28 228, 30 212 C 32 194, 28 178, 26 164 C 24 146, 20 124, 20 100 C 20 60, 44 12, 75 12 Z`;
+// 左足: 土踏まずくびれ = 左側(x小)
+const PATH_LEFT = `M 75 12
+  C 55 12, 18 36, 12 76
+  C 8 112, 20 150, 26 172
+  C 30 190, 30 206, 30 220
+  C 30 234, 30 248, 34 260
+  C 38 272, 50 284, 68 290
+  C 80 295, 96 295, 110 291
+  C 122 287, 128 274, 128 260
+  C 128 244, 122 228, 120 212
+  C 118 194, 122 178, 124 164
+  C 126 146, 130 124, 130 100
+  C 130 60, 106 12, 75 12 Z`;
 
-function tread(isLeft) {
-  if (!isLeft) return `
-    <rect x="26" y="58"  width="88" height="4" rx="2" fill="white" opacity="0.15"/>
-    <rect x="24" y="72"  width="94" height="4" rx="2" fill="white" opacity="0.15"/>
-    <rect x="24" y="86"  width="98" height="4" rx="2" fill="white" opacity="0.15"/>
-    <rect x="24" y="100" width="100" height="4" rx="2" fill="white" opacity="0.15"/>
-    <rect x="25" y="114" width="100" height="4" rx="2" fill="white" opacity="0.15"/>
-    <rect x="26" y="128" width="96"  height="4" rx="2" fill="white" opacity="0.15"/>
-    <circle cx="68"  cy="162" r="3" fill="white" opacity="0.15"/>
-    <circle cx="84"  cy="165" r="3" fill="white" opacity="0.15"/>
-    <circle cx="100" cy="164" r="3" fill="white" opacity="0.15"/>
-    <path d="M 54 232 Q 91 220, 116 226" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.15"/>
-    <path d="M 50 246 Q 91 233, 120 240" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" opacity="0.15"/>
-    <path d="M 50 258 Q 91 246, 122 254" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.15"/>`;
+// トレッド（右足）
+function treadR() {
   return `
-    <rect x="36" y="58"  width="88" height="4" rx="2" fill="white" opacity="0.15"/>
-    <rect x="32" y="72"  width="94" height="4" rx="2" fill="white" opacity="0.15"/>
-    <rect x="28" y="86"  width="98" height="4" rx="2" fill="white" opacity="0.15"/>
-    <rect x="26" y="100" width="100" height="4" rx="2" fill="white" opacity="0.15"/>
-    <rect x="25" y="114" width="100" height="4" rx="2" fill="white" opacity="0.15"/>
-    <rect x="24" y="128" width="96"  height="4" rx="2" fill="white" opacity="0.15"/>
-    <circle cx="50" cy="162" r="3" fill="white" opacity="0.15"/>
-    <circle cx="66" cy="165" r="3" fill="white" opacity="0.15"/>
-    <circle cx="82" cy="164" r="3" fill="white" opacity="0.15"/>
-    <path d="M 34 232 Q 55 220, 96 226" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.15"/>
-    <path d="M 30 246 Q 55 233, 100 240" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" opacity="0.15"/>
-    <path d="M 28 258 Q 55 246, 100 254" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.15"/>`;
+    <rect x="26" y="58"  width="88" height="4" rx="2" fill="white" opacity="0.18"/>
+    <rect x="24" y="72"  width="94" height="4" rx="2" fill="white" opacity="0.18"/>
+    <rect x="24" y="86"  width="98" height="4" rx="2" fill="white" opacity="0.18"/>
+    <rect x="24" y="100" width="100" height="4" rx="2" fill="white" opacity="0.18"/>
+    <rect x="25" y="114" width="100" height="4" rx="2" fill="white" opacity="0.18"/>
+    <rect x="26" y="128" width="96"  height="4" rx="2" fill="white" opacity="0.18"/>
+    <circle cx="50" cy="162" r="3" fill="white" opacity="0.18"/>
+    <circle cx="66" cy="165" r="3" fill="white" opacity="0.18"/>
+    <circle cx="82" cy="164" r="3" fill="white" opacity="0.18"/>
+    <path d="M 34 232 Q 55 220, 96 226" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.18"/>
+    <path d="M 30 246 Q 55 233, 100 240" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" opacity="0.18"/>
+    <path d="M 28 258 Q 55 246, 100 254" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.18"/>`;
+}
+
+// トレッド（左足）
+function treadL() {
+  return `
+    <rect x="36" y="58"  width="88" height="4" rx="2" fill="white" opacity="0.18"/>
+    <rect x="32" y="72"  width="94" height="4" rx="2" fill="white" opacity="0.18"/>
+    <rect x="28" y="86"  width="98" height="4" rx="2" fill="white" opacity="0.18"/>
+    <rect x="26" y="100" width="100" height="4" rx="2" fill="white" opacity="0.18"/>
+    <rect x="25" y="114" width="100" height="4" rx="2" fill="white" opacity="0.18"/>
+    <rect x="24" y="128" width="96"  height="4" rx="2" fill="white" opacity="0.18"/>
+    <circle cx="68" cy="162" r="3" fill="white" opacity="0.18"/>
+    <circle cx="84" cy="165" r="3" fill="white" opacity="0.18"/>
+    <circle cx="100" cy="164" r="3" fill="white" opacity="0.18"/>
+    <path d="M 54 232 Q 91 220, 116 226" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.18"/>
+    <path d="M 50 246 Q 91 233, 120 240" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" opacity="0.18"/>
+    <path d="M 50 258 Q 91 246, 122 254" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.18"/>`;
 }
 
 // 摩耗ゾーン
-// RIGHT足: 外側=右(x大), 内側=左(x小)
-// LEFT足:  外側=左(x小), 内側=右(x大)
+// 右足: 内側=右(x大), 外側=左(x小)
+// 左足: 内側=左(x小), 外側=右(x大)
 function wearZone(pos, isLeft, color) {
   const R = {
-    'heel-out':    `<rect x="90" y="228" width="36" height="58" rx="14"/>`,
-    'heel-in':     `<rect x="24" y="228" width="36" height="58" rx="14"/>`,
-    'heel-center': `<rect x="38" y="232" width="74" height="54" rx="14"/>`,
-    'heel-full':   `<rect x="18" y="226" width="112" height="60" rx="16"/>`,
-    'outer-all':   `<rect x="100" y="55" width="32" height="210" rx="14"/>`,
-    'inner-all':   `<rect x="18"  y="55" width="32" height="210" rx="14"/>`,
-    'ball':        `<rect x="18"  y="75" width="55" height="60"  rx="14"/>`,
-    'fore-all':    `<rect x="18"  y="44" width="114" height="96" rx="16"/>`,
-    'fore-out':    `<rect x="90"  y="44" width="42" height="86"  rx="14"/>`,
-    'toe-tip':     `<rect x="28"  y="8"  width="94" height="60"  rx="16"/>`,
-    'arch':        `<rect x="18"  y="150" width="32" height="66" rx="12"/>`,
-    'asym':        `<rect x="90" y="228" width="36" height="58" rx="14"/>`,
+    'heel-out':    `<rect x="20"  y="228" width="40" height="58" rx="14"/>`, // 外側=左(x小)
+    'heel-in':     `<rect x="90"  y="228" width="40" height="58" rx="14"/>`, // 内側=右(x大)
+    'heel-center': `<rect x="38"  y="232" width="74" height="54" rx="14"/>`,
+    'heel-full':   `<rect x="16"  y="226" width="118" height="60" rx="16"/>`,
+    'outer-all':   `<rect x="14"  y="55"  width="34" height="215" rx="14"/>`, // 外側=左
+    'inner-all':   `<rect x="102" y="55"  width="34" height="215" rx="14"/>`, // 内側=右
+    'ball':        `<rect x="96"  y="72"  width="46" height="58"  rx="14"/>`, // 母趾球=内側=右
+    'fore-all':    `<rect x="16"  y="44"  width="118" height="96" rx="16"/>`,
+    'fore-out':    `<rect x="14"  y="44"  width="46" height="86"  rx="14"/>`, // 前足外側=左
+    'toe-tip':     `<rect x="26"  y="8"   width="98"  height="60" rx="16"/>`,
+    'arch':        `<rect x="102" y="148" width="34"  height="68" rx="12"/>`, // 土踏まず=内側=右
+    'asym':        `<rect x="20"  y="228" width="40" height="58" rx="14"/>`,
   };
   const L = {
-    'heel-out':    `<rect x="24" y="228" width="36" height="58" rx="14"/>`,
-    'heel-in':     `<rect x="90" y="228" width="36" height="58" rx="14"/>`,
-    'heel-center': `<rect x="38" y="232" width="74" height="54" rx="14"/>`,
-    'heel-full':   `<rect x="20" y="226" width="112" height="60" rx="16"/>`,
-    'outer-all':   `<rect x="18"  y="55" width="32" height="210" rx="14"/>`,
-    'inner-all':   `<rect x="100" y="55" width="32" height="210" rx="14"/>`,
-    'ball':        `<rect x="77"  y="75" width="55" height="60"  rx="14"/>`,
-    'fore-all':    `<rect x="18"  y="44" width="114" height="96" rx="16"/>`,
-    'fore-out':    `<rect x="18"  y="44" width="42" height="86"  rx="14"/>`,
-    'toe-tip':     `<rect x="28"  y="8"  width="94" height="60"  rx="16"/>`,
-    'arch':        `<rect x="100" y="150" width="32" height="66" rx="12"/>`,
-    'asym':        `<rect x="24" y="228" width="36" height="58" rx="14"/>`,
+    'heel-out':    `<rect x="90"  y="228" width="40" height="58" rx="14"/>`, // 外側=右(x大)
+    'heel-in':     `<rect x="20"  y="228" width="40" height="58" rx="14"/>`, // 内側=左(x小)
+    'heel-center': `<rect x="38"  y="232" width="74" height="54" rx="14"/>`,
+    'heel-full':   `<rect x="16"  y="226" width="118" height="60" rx="16"/>`,
+    'outer-all':   `<rect x="102" y="55"  width="34" height="215" rx="14"/>`, // 外側=右
+    'inner-all':   `<rect x="14"  y="55"  width="34" height="215" rx="14"/>`, // 内側=左
+    'ball':        `<rect x="8"   y="72"  width="46" height="58"  rx="14"/>`, // 母趾球=内側=左
+    'fore-all':    `<rect x="16"  y="44"  width="118" height="96" rx="16"/>`,
+    'fore-out':    `<rect x="90"  y="44"  width="46" height="86"  rx="14"/>`, // 前足外側=右
+    'toe-tip':     `<rect x="26"  y="8"   width="98"  height="60" rx="16"/>`,
+    'arch':        `<rect x="14"  y="148" width="34"  height="68" rx="12"/>`, // 土踏まず=内側=左
+    'asym':        `<rect x="90"  y="228" width="40" height="58" rx="14"/>`,
   };
   const shape = isLeft ? (L[pos]||'') : (R[pos]||'');
-  return shape.replace('<rect ', `<rect fill="${color}" opacity="0.88" `);
+  return shape.replace('<rect ', `<rect fill="${color}" opacity="0.9" `);
 }
 
 let _uid = 0;
@@ -208,20 +243,23 @@ function makeSole(wearPos, isLeft, color, px) {
   const VW=150, VH=310;
   const dH = Math.round(px * VH / VW);
   const path = isLeft ? PATH_LEFT : PATH_RIGHT;
+  const tr = isLeft ? treadL() : treadR();
   const id = `c${++_uid}`;
   const zone = wearZone(wearPos, isLeft, color);
+  // 靴底の塗り色を少し明るくして視認性向上
   return `<svg width="${px}" height="${dH}" viewBox="0 0 ${VW} ${VH}" fill="none" xmlns="http://www.w3.org/2000/svg">
     <defs><clipPath id="${id}"><path d="${path}"/></clipPath></defs>
-    <path d="${path}" fill="#1e2438" stroke="#3a4a6a" stroke-width="2"/>
-    ${tread(isLeft)}
+    <path d="${path}" fill="#2a3555" stroke="#4a5a80" stroke-width="2"/>
+    ${tr}
     <g clip-path="url(#${id})">${zone}</g>
   </svg>`;
 }
 
+// 左足を左、右足を右に表示
 function feetHTML(p, sz) {
   return `
-    <div class="pbar-foot-col"><div class="pbar-lbl">右</div>${makeSole(p.wearPos,false,p.color,sz)}</div>
-    <div class="pbar-foot-col"><div class="pbar-lbl">左</div>${makeSole(p.wearPos,true,p.color,sz)}</div>`;
+    <div class="pbar-foot-col"><div class="pbar-lbl">左</div>${makeSole(p.wearPos,true,p.color,sz)}</div>
+    <div class="pbar-foot-col"><div class="pbar-lbl">右</div>${makeSole(p.wearPos,false,p.color,sz)}</div>`;
 }
 
 function parseCSV(txt) {
@@ -315,8 +353,8 @@ function render(d){
       ${sorted.map(p=>`
       <div class="pd-card" style="border-top:3px solid ${p.color}">
         <div class="pd-feet">
-          <div class="pd-foot-col"><div class="pd-fl">右</div>${makeSole(p.wearPos,false,p.color,42)}</div>
           <div class="pd-foot-col"><div class="pd-fl">左</div>${makeSole(p.wearPos,true,p.color,42)}</div>
+          <div class="pd-foot-col"><div class="pd-fl">右</div>${makeSole(p.wearPos,false,p.color,42)}</div>
         </div>
         <div class="pd-name">${p.name}</div>
         <div class="pd-cnt" style="color:${p.color}">${wc[p.name]||0}</div>
