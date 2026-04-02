@@ -140,22 +140,9 @@ const SYM_ICONS = {'腰痛':'🔴','膝痛':'🟠','首こり':'🔵','肩こり
 // 左足パス: くびれが左側（x小側）
 // =============================================
 
-// 右足: 土踏まずくびれ = 右側(x大)
+// 右足（足底視点）: 土踏まずくびれ = 右側(x大) = 内側
+// 右足は向かって右側が親指・内側
 const PATH_RIGHT = `M 75 12
-  C 95 12, 132 36, 138 76
-  C 142 112, 130 150, 124 172
-  C 120 190, 120 206, 120 220
-  C 120 234, 120 248, 116 260
-  C 112 272, 100 284, 82 290
-  C 70 295, 54 295, 40 291
-  C 28 287, 22 274, 22 260
-  C 22 244, 28 228, 30 212
-  C 32 194, 28 178, 26 164
-  C 24 146, 20 124, 20 100
-  C 20 60, 44 12, 75 12 Z`;
-
-// 左足: 土踏まずくびれ = 左側(x小)
-const PATH_LEFT = `M 75 12
   C 55 12, 18 36, 12 76
   C 8 112, 20 150, 26 172
   C 30 190, 30 206, 30 220
@@ -168,38 +155,53 @@ const PATH_LEFT = `M 75 12
   C 126 146, 130 124, 130 100
   C 130 60, 106 12, 75 12 Z`;
 
+// 左足（足底視点）: 土踏まずくびれ = 左側(x小) = 内側
+// 左足は向かって左側が親指・内側
+const PATH_LEFT = `M 75 12
+  C 95 12, 132 36, 138 76
+  C 142 112, 130 150, 124 172
+  C 120 190, 120 206, 120 220
+  C 120 234, 120 248, 116 260
+  C 112 272, 100 284, 82 290
+  C 70 295, 54 295, 40 291
+  C 28 287, 22 274, 22 260
+  C 22 244, 28 228, 30 212
+  C 32 194, 28 178, 26 164
+  C 24 146, 20 124, 20 100
+  C 20 60, 44 12, 75 12 Z`;
+
 // トレッド（右足）
 function treadR() {
   return `
-    <rect x="26" y="58"  width="88" height="4" rx="2" fill="white" opacity="0.18"/>
-    <rect x="24" y="72"  width="94" height="4" rx="2" fill="white" opacity="0.18"/>
-    <rect x="24" y="86"  width="98" height="4" rx="2" fill="white" opacity="0.18"/>
-    <rect x="24" y="100" width="100" height="4" rx="2" fill="white" opacity="0.18"/>
-    <rect x="25" y="114" width="100" height="4" rx="2" fill="white" opacity="0.18"/>
-    <rect x="26" y="128" width="96"  height="4" rx="2" fill="white" opacity="0.18"/>
-    <circle cx="50" cy="162" r="3" fill="white" opacity="0.18"/>
-    <circle cx="66" cy="165" r="3" fill="white" opacity="0.18"/>
-    <circle cx="82" cy="164" r="3" fill="white" opacity="0.18"/>
-    <path d="M 34 232 Q 55 220, 96 226" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.18"/>
-    <path d="M 30 246 Q 55 233, 100 240" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" opacity="0.18"/>
-    <path d="M 28 258 Q 55 246, 100 254" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.18"/>`;
+    <rect x="26" y="58"  width="88" height="4" rx="2" fill="#1a1a1a" opacity="0.25"/>
+    <rect x="24" y="72"  width="94" height="4" rx="2" fill="#1a1a1a" opacity="0.25"/>
+    <rect x="24" y="86"  width="98" height="4" rx="2" fill="#1a1a1a" opacity="0.25"/>
+    <rect x="24" y="100" width="100" height="4" rx="2" fill="#1a1a1a" opacity="0.25"/>
+    <rect x="25" y="114" width="100" height="4" rx="2" fill="#1a1a1a" opacity="0.25"/>
+    <rect x="26" y="128" width="96"  height="4" rx="2" fill="#1a1a1a" opacity="0.25"/>
+    <circle cx="50" cy="162" r="3" fill="#1a1a1a" opacity="0.25"/>
+    <circle cx="66" cy="165" r="3" fill="#1a1a1a" opacity="0.25"/>
+    <circle cx="82" cy="164" r="3" fill="#1a1a1a" opacity="0.25"/>
+    <path d="M 34 232 Q 55 220, 96 226" fill="none" stroke="#1a1a1a" stroke-width="3" stroke-linecap="round" opacity="0.25"/>
+    <path d="M 30 246 Q 55 233, 100 240" fill="none" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round" opacity="0.25"/>
+    <path d="M 28 258 Q 55 246, 100 254" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round" opacity="0.25"/>`;
 }
 
 // トレッド（左足）
 function treadL() {
   return `
-    <rect x="36" y="58"  width="88" height="4" rx="2" fill="white" opacity="0.18"/>
-    <rect x="32" y="72"  width="94" height="4" rx="2" fill="white" opacity="0.18"/>
-    <rect x="28" y="86"  width="98" height="4" rx="2" fill="white" opacity="0.18"/>
-    <rect x="26" y="100" width="100" height="4" rx="2" fill="white" opacity="0.18"/>
-    <rect x="25" y="114" width="100" height="4" rx="2" fill="white" opacity="0.18"/>
-    <rect x="24" y="128" width="96"  height="4" rx="2" fill="white" opacity="0.18"/>
-    <circle cx="68" cy="162" r="3" fill="white" opacity="0.18"/>
-    <circle cx="84" cy="165" r="3" fill="white" opacity="0.18"/>
-    <circle cx="100" cy="164" r="3" fill="white" opacity="0.18"/>
-    <path d="M 54 232 Q 91 220, 116 226" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.18"/>
-    <path d="M 50 246 Q 91 233, 120 240" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" opacity="0.18"/>
-    <path d="M 50 258 Q 91 246, 122 254" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.18"/>`;
+    <rect x="36" y="58"  width="88" height="4" rx="2" fill="#1a1a1a" opacity="0.25"/>
+    <rect x="32" y="72"  width="94" height="4" rx="2" fill="#1a1a1a" opacity="0.25"/>
+    <rect x="28" y="86"  width="98" height="4" rx="2" fill="#1a1a1a" opacity="0.25"/>
+    <rect x="26" y="100" width="100" height="4" rx="2" fill="#1a1a1a" opacity="0.25"/>
+    <rect x="25" y="114" width="100" height="4" rx="2" fill="#1a1a1a" opacity="0.25"/>
+    <rect x="24" y="128" width="96"  height="4" rx="2" fill="#1a1a1a" opacity="0.25"/>
+    <circle cx="68" cy="162" r="3" fill="#1a1a1a" opacity="0.25"/>
+    <circle cx="84" cy="165" r="3" fill="#1a1a1a" opacity="0.25"/>
+    <circle cx="100" cy="164" r="3" fill="#1a1a1a" opacity="0.25"/>
+    <path d="M 54 232 Q 91 220, 116 226" fill="none" stroke="#1a1a1a" stroke-width="3" stroke-linecap="round" opacity="0.25"/>
+    <path d="M 50 246 Q 91 233, 120 240" fill="none" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round" opacity="0.25"/>
+    <path d="M 50 258 Q 91 246, 122 254" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round" opacity="0.25"/>`;
 }
 
 // 摩耗ゾーン
@@ -249,7 +251,7 @@ function makeSole(wearPos, isLeft, color, px) {
   // 靴底の塗り色を少し明るくして視認性向上
   return `<svg width="${px}" height="${dH}" viewBox="0 0 ${VW} ${VH}" fill="none" xmlns="http://www.w3.org/2000/svg">
     <defs><clipPath id="${id}"><path d="${path}"/></clipPath></defs>
-    <path d="${path}" fill="#2a3555" stroke="#4a5a80" stroke-width="2"/>
+    <path d="${path}" fill="#f0ede8" stroke="#c8c4bc" stroke-width="2"/>
     ${tr}
     <g clip-path="url(#${id})">${zone}</g>
   </svg>`;
