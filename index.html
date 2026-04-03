@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 <html lang="ja">
@@ -140,8 +139,7 @@ const SYM_ICONS = {'腰痛':'🔴','膝痛':'🟠','首こり':'🔵','肩こり
 // 左足パス: くびれが左側（x小側）
 // =============================================
 
-// 右足（足底視点）: 土踏まずくびれ = 右側(x大) = 内側
-// 右足は向かって右側が親指・内側
+// 右足: 元のSVGのRIGHTパス（アーチくびれ=左側）
 const PATH_RIGHT = `M 75 12
   C 55 12, 18 36, 12 76
   C 8 112, 20 150, 26 172
@@ -155,8 +153,7 @@ const PATH_RIGHT = `M 75 12
   C 126 146, 130 124, 130 100
   C 130 60, 106 12, 75 12 Z`;
 
-// 左足（足底視点）: 土踏まずくびれ = 左側(x小) = 内側
-// 左足は向かって左側が親指・内側
+// 左足: 元のSVGのLEFTパス（アーチくびれ=右側）
 const PATH_LEFT = `M 75 12
   C 95 12, 132 36, 138 76
   C 142 112, 130 150, 124 172
@@ -179,12 +176,12 @@ function treadR() {
     <rect x="24" y="100" width="100" height="4" rx="2" fill="#1a1a1a" opacity="0.25"/>
     <rect x="25" y="114" width="100" height="4" rx="2" fill="#1a1a1a" opacity="0.25"/>
     <rect x="26" y="128" width="96"  height="4" rx="2" fill="#1a1a1a" opacity="0.25"/>
-    <circle cx="50" cy="162" r="3" fill="#1a1a1a" opacity="0.25"/>
-    <circle cx="66" cy="165" r="3" fill="#1a1a1a" opacity="0.25"/>
-    <circle cx="82" cy="164" r="3" fill="#1a1a1a" opacity="0.25"/>
-    <path d="M 34 232 Q 55 220, 96 226" fill="none" stroke="#1a1a1a" stroke-width="3" stroke-linecap="round" opacity="0.25"/>
-    <path d="M 30 246 Q 55 233, 100 240" fill="none" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round" opacity="0.25"/>
-    <path d="M 28 258 Q 55 246, 100 254" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round" opacity="0.25"/>`;
+    <circle cx="68"  cy="160" r="2.5" fill="#1a1a1a" opacity="0.25"/>
+    <circle cx="84"  cy="163" r="2.5" fill="#1a1a1a" opacity="0.25"/>
+    <circle cx="100" cy="162" r="2.5" fill="#1a1a1a" opacity="0.25"/>
+    <path d="M 58 228 Q 95 216, 116 222" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round" opacity="0.25"/>
+    <path d="M 54 243 Q 95 230, 120 237" fill="none" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round" opacity="0.25"/>
+    <path d="M 54 256 Q 95 244, 122 252" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round" opacity="0.25"/>`;
 }
 
 // トレッド（左足）
@@ -196,12 +193,12 @@ function treadL() {
     <rect x="26" y="100" width="100" height="4" rx="2" fill="#1a1a1a" opacity="0.25"/>
     <rect x="25" y="114" width="100" height="4" rx="2" fill="#1a1a1a" opacity="0.25"/>
     <rect x="24" y="128" width="96"  height="4" rx="2" fill="#1a1a1a" opacity="0.25"/>
-    <circle cx="68" cy="162" r="3" fill="#1a1a1a" opacity="0.25"/>
-    <circle cx="84" cy="165" r="3" fill="#1a1a1a" opacity="0.25"/>
-    <circle cx="100" cy="164" r="3" fill="#1a1a1a" opacity="0.25"/>
-    <path d="M 54 232 Q 91 220, 116 226" fill="none" stroke="#1a1a1a" stroke-width="3" stroke-linecap="round" opacity="0.25"/>
-    <path d="M 50 246 Q 91 233, 120 240" fill="none" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round" opacity="0.25"/>
-    <path d="M 50 258 Q 91 246, 122 254" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round" opacity="0.25"/>`;
+    <circle cx="50" cy="160" r="2.5" fill="#1a1a1a" opacity="0.25"/>
+    <circle cx="66" cy="163" r="2.5" fill="#1a1a1a" opacity="0.25"/>
+    <circle cx="82" cy="162" r="2.5" fill="#1a1a1a" opacity="0.25"/>
+    <path d="M 34 228 Q 55 216, 92 222" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round" opacity="0.25"/>
+    <path d="M 30 243 Q 55 230, 96 237" fill="none" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round" opacity="0.25"/>
+    <path d="M 28 256 Q 55 244, 96 252" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round" opacity="0.25"/>`;
 }
 
 // 摩耗ゾーン（足底視点・正しい内外側）
@@ -306,11 +303,13 @@ function analyze(rows) {
     const shk=Object.keys(row).find(k=>k.includes('靴の種類'));
     const wear=wk?row[wk]:'',syms=sk?row[sk]:'';
     const age=ak?row[ak]:'',gender=gk?row[gk]:'',shoe=shk?row[shk]:'';
+    // URLや長すぎる値・ゴミデータをフィルタリング
+    const isValid = v => v && !v.includes('http') && !v.includes('drive.google') && v.length < 30;
     if(wear&&wc[wear]!==undefined)wc[wear]++;
     SYMPTOMS.forEach(s=>{if(syms.includes(s)){sc[s]++;if(wear&&ws[wear])ws[wear][s]++;}});
-    if(age)ac[age]=(ac[age]||0)+1;
-    if(gender)gc[gender]=(gc[gender]||0)+1;
-    if(shoe)shc[shoe]=(shc[shoe]||0)+1;
+    if(isValid(age))ac[age]=(ac[age]||0)+1;
+    if(isValid(gender))gc[gender]=(gc[gender]||0)+1;
+    if(isValid(shoe))shc[shoe]=(shc[shoe]||0)+1;
   });
 
   // 過去データを合算
@@ -348,7 +347,7 @@ function render(d){
     <button class="tab-btn" onclick="sw('patterns',this)">👟 摩耗</button>
     <button class="tab-btn" onclick="sw('symptoms',this)">🩺 症状</button>
     <button class="tab-btn" onclick="sw('attr',this)">👤 属性</button>
-    <button class="tab-btn" onclick="sw('matrix',this)">🔥 マトリクス</button>
+
   </div>
 
   <div id="tab-overview" class="tab-panel active">
@@ -427,25 +426,6 @@ function render(d){
       <div class="attr-track"><div class="attr-fill" style="width:${Math.round(v/total*100)}%"><span class="attr-val">${v}</span></div></div>
       <div class="attr-pct">${Math.round(v/total*100)}%</div></div>`).join('')}
     </div>`}
-  </div>
-
-  <div id="tab-matrix" class="tab-panel">
-    <div class="sec">摩耗パターン × 症状 関連性（%）</div>
-    ${total===0?`<div class="no-data">回答データなし</div>`:`
-    <div class="hm-wrap">
-      <table class="hm-table">
-        <thead><tr><th></th>${SYMPTOMS.map(s=>`<th>${s}</th>`).join('')}</tr></thead>
-        <tbody>${sorted.map(p=>{
-          const cnt=wc[p.name]||0;
-          return`<tr><td class="rl">${p.name.substring(0,5)}</td>
-          ${SYMPTOMS.map(s=>{
-            const v=cnt>0?Math.round((ws[p.name][s]||0)/cnt*100):0;
-            return`<td class="cell" style="background:${heatCol(v)};color:${v>50?'white':'var(--muted)'}">${v>0?v+'%':''}</td>`;
-          }).join('')}</tr>`;
-        }).join('')}</tbody>
-      </table>
-    </div>
-    <div style="margin-top:9px;font-size:10px;color:var(--dim)">※ 各セルは「そのパターンの回答者のうち該当症状を持つ割合」</div>`}
   </div>
 
   <div class="last-upd" id="lupd"></div>`;
