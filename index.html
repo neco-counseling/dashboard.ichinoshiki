@@ -204,25 +204,11 @@ function treadL() {
     <path d="M 50 258 Q 91 246, 122 254" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round" opacity="0.25"/>`;
 }
 
-// 摩耗ゾーン
-// 右足: 内側=右(x大), 外側=左(x小)
-// 左足: 内側=左(x小), 外側=右(x大)
+// 摩耗ゾーン（足底視点・正しい内外側）
+// 右足: 内側=左(x小), 外側=右(x大)
+// 左足: 内側=右(x大), 外側=左(x小)
 function wearZone(pos, isLeft, color) {
   const R = {
-    'heel-out':    `<rect x="20"  y="228" width="40" height="58" rx="14"/>`, // 外側=左(x小)
-    'heel-in':     `<rect x="90"  y="228" width="40" height="58" rx="14"/>`, // 内側=右(x大)
-    'heel-center': `<rect x="38"  y="232" width="74" height="54" rx="14"/>`,
-    'heel-full':   `<rect x="16"  y="226" width="118" height="60" rx="16"/>`,
-    'outer-all':   `<rect x="14"  y="55"  width="34" height="215" rx="14"/>`, // 外側=左
-    'inner-all':   `<rect x="102" y="55"  width="34" height="215" rx="14"/>`, // 内側=右
-    'ball':        `<rect x="96"  y="72"  width="46" height="58"  rx="14"/>`, // 母趾球=内側=右
-    'fore-all':    `<rect x="16"  y="44"  width="118" height="96" rx="16"/>`,
-    'fore-out':    `<rect x="14"  y="44"  width="46" height="86"  rx="14"/>`, // 前足外側=左
-    'toe-tip':     `<rect x="26"  y="8"   width="98"  height="60" rx="16"/>`,
-    'arch':        `<rect x="102" y="148" width="34"  height="68" rx="12"/>`, // 土踏まず=内側=右
-    'asym':        `<rect x="20"  y="228" width="40" height="58" rx="14"/>`,
-  };
-  const L = {
     'heel-out':    `<rect x="90"  y="228" width="40" height="58" rx="14"/>`, // 外側=右(x大)
     'heel-in':     `<rect x="20"  y="228" width="40" height="58" rx="14"/>`, // 内側=左(x小)
     'heel-center': `<rect x="38"  y="232" width="74" height="54" rx="14"/>`,
@@ -235,6 +221,20 @@ function wearZone(pos, isLeft, color) {
     'toe-tip':     `<rect x="26"  y="8"   width="98"  height="60" rx="16"/>`,
     'arch':        `<rect x="14"  y="148" width="34"  height="68" rx="12"/>`, // 土踏まず=内側=左
     'asym':        `<rect x="90"  y="228" width="40" height="58" rx="14"/>`,
+  };
+  const L = {
+    'heel-out':    `<rect x="20"  y="228" width="40" height="58" rx="14"/>`, // 外側=左(x小)
+    'heel-in':     `<rect x="90"  y="228" width="40" height="58" rx="14"/>`, // 内側=右(x大)
+    'heel-center': `<rect x="38"  y="232" width="74" height="54" rx="14"/>`,
+    'heel-full':   `<rect x="16"  y="226" width="118" height="60" rx="16"/>`,
+    'outer-all':   `<rect x="14"  y="55"  width="34" height="215" rx="14"/>`, // 外側=左
+    'inner-all':   `<rect x="102" y="55"  width="34" height="215" rx="14"/>`, // 内側=右
+    'ball':        `<rect x="96"  y="72"  width="46" height="58"  rx="14"/>`, // 母趾球=内側=右
+    'fore-all':    `<rect x="16"  y="44"  width="118" height="96" rx="16"/>`,
+    'fore-out':    `<rect x="14"  y="44"  width="46" height="86"  rx="14"/>`, // 前足外側=左
+    'toe-tip':     `<rect x="26"  y="8"   width="98"  height="60" rx="16"/>`,
+    'arch':        `<rect x="102" y="148" width="34"  height="68" rx="12"/>`, // 土踏まず=内側=右
+    'asym':        `<rect x="20"  y="228" width="40" height="58" rx="14"/>`,
   };
   const shape = isLeft ? (L[pos]||'') : (R[pos]||'');
   return shape.replace('<rect ', `<rect fill="${color}" opacity="0.9" `);
