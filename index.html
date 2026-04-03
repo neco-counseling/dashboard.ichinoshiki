@@ -277,8 +277,23 @@ function parseCSV(txt) {
   });
 }
 
+// =============================================
+// 過去データ（旧フォーム150人分）
+// 摩耗パターン件数 + 腰痛・肩こりのみ合算
+// =============================================
+const PAST_DATA = {
+  total: 150,
+  wc: {
+    '①踵外側摩耗':39, '②踵内側摩耗':25, '⑥左右非対称摩耗':22,
+    '④踵中央摩耗':14, '⑧外側全体摩耗':10, '⑤踵全面摩耗':8,
+    '⑨母趾球摩耗':8,  '⑫靴先反り摩耗':7, '⑩前足部外側摩耗':7,
+    '③前足部全体摩耗':5,'⑦内側全体摩耗':3, '⑪土踏まず摩耗':2,
+  },
+  sc: { '腰痛':75, '肩こり':27 },
+};
+
 function analyze(rows) {
-  const total=rows.length;
+  const newTotal=rows.length;
   const wc={};PATTERNS.forEach(p=>wc[p.name]=0);
   const sc={};SYMPTOMS.forEach(s=>sc[s]=0);
   const ws={};PATTERNS.forEach(p=>{ws[p.name]={};SYMPTOMS.forEach(s=>ws[p.name][s]=0);});
@@ -297,6 +312,16 @@ function analyze(rows) {
     if(gender)gc[gender]=(gc[gender]||0)+1;
     if(shoe)shc[shoe]=(shc[shoe]||0)+1;
   });
+
+  // 過去データを合算
+  const total = newTotal + PAST_DATA.total;
+  PATTERNS.forEach(p=>{
+    wc[p.name] = (wc[p.name]||0) + (PAST_DATA.wc[p.name]||0);
+  });
+  // 腰痛・肩こりのみ合算
+  sc['腰痛']  = (sc['腰痛']||0)  + PAST_DATA.sc['腰痛'];
+  sc['肩こり'] = (sc['肩こり']||0) + PAST_DATA.sc['肩こり'];
+
   return{total,wc,sc,ws,ac,gc,shc};
 }
 
